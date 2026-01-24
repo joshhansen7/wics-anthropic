@@ -114,7 +114,7 @@ def claude_cache_match(client: Anthropic, query: str, language: str, cached_arti
 
     try:
         response = client.messages.create(
-            model="claude-4-5-haiku-latest",
+            model="claude-haiku-4-5",
             max_tokens=1000,
             messages=[{"role": "user", "content": prompt}],
             temperature=0.2

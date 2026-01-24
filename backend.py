@@ -86,7 +86,7 @@ SYNTHESIZED ARTICLE:"""
 
 # Claude API information
 CLAUDE_API_KEY = os.getenv("CLAUDE_API_KEY")
-CLAUDE_MODEL = "claude-4-5-haiku-latest"
+CLAUDE_MODEL = "claude-haiku-4-5"
 
 # Define cache directory
 CACHE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "cache")

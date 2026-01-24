@@ -238,7 +238,7 @@ def evaluate_search_results(client, user_query: str, search_results: List[Dict[s
     try:
         # Make API call to Claude
         response = client.messages.create(
-            model="claude-4-5-haiku-latest",
+            model="claude-haiku-4-5",
             max_tokens=1000,
             messages=[
                 {"role": "user", "content": prompt}
