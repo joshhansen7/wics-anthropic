@@ -19,9 +19,10 @@
             <h1 class="text-2xl font-semibold mb-6">Synthesizing Article</h1>
             
             <div class="loading-spinner mb-6"></div>
-            <!-- Manual reload prompt -->
+            <!-- Auto-redirect prompt -->
             <div id="reloadPrompt" class="mt-6 p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800" style="display:none;">
-                <p>Synthesis is complete -- reload to view your article!</p>
+                <p class="mb-2">Synthesis is complete — taking you to your article.</p>
+                <a id="viewArticleLink" href="{{ url_for('view_article', language=language, article_name=article_name) }}" class="text-blue-700 hover:underline">Open article now</a>
             </div>
             
             <p class="mb-4">Creating a comprehensive article about <strong>{{ job.title }}</strong></p>
@@ -75,6 +76,9 @@
     </div>
     
     <script>
+        const articleUrl = '{{ url_for("view_article", language=language, article_name=article_name) }}';
+        let redirected = false;
+
         // Polling for status via path-based API
         function updateProgress() {
             fetch('{{ url_for("api_status_by_path", language=language, article_name=article_name) }}')
@@ -85,12 +89,14 @@
                     document.getElementById('progressText').textContent = data.progress;
                     updateCurrentStep(data.progress);
                     
-                    // If complete, show manual reload prompt
-                    if (data.status === 'completed' || data.progress === 100) {
+                    // If complete, show prompt and auto-redirect to the article
+                    if (!redirected && (data.status === 'completed' || data.progress === 100)) {
+                        redirected = true;
                         const prompt = document.getElementById('reloadPrompt');
                         prompt.style.display = 'block';
-                        document.getElementById('reloadButton')
-                                .addEventListener('click', () => window.location.reload());
+                        setTimeout(() => {
+                            window.location.href = articleUrl;
+                        }, 500);
                         return;
                     }
                     // Otherwise keep polling
