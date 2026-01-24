@@ -128,17 +128,11 @@
                         <ul class="list-disc text-sm">
                             {% if selected_languages %}
                                 {% for lang_code in selected_languages %}
-                                    <li>
-                                        {% for lang in all_languages %}
-                                            {% if lang.code == lang_code %}
-                                                {{ lang.name }}
-                                            {% endif %}
-                                        {% endfor %}
-                                    </li>
+                                    <li>{{ lang_code|language_name(language) }}</li>
                                 {% endfor %}
                             {% else %}
                                 {% for lang in languages[:max_translations] %}
-                                    <li>{{ lang.name }}</li>
+                                    <li>{{ lang.code|language_name(language) }}</li>
                                 {% endfor %}
                             {% endif %}
                         </ul>

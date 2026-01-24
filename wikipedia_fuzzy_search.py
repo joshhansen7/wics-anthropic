@@ -1,8 +1,8 @@
 """
 Wikipedia Fuzzy Search Module
 
-This module enhances the Wikipedia search functionality with fuzzy matching
-capabilities to handle misspellings and provide better search results.
+Enhances Wikipedia search with fuzzy matching to handle misspellings
+and provide better search results using Claude AI.
 """
 
 import wikipediaapi
@@ -12,7 +12,6 @@ import json
 from typing import List, Dict, Tuple, Optional, Any
 import tiktoken
 
-# Global variable to store the last searched title
 _last_searched_title = None
 
 def get_full_article_content(title: str, language: str) -> Tuple[Optional[str], Optional[List[Dict]]]:
@@ -154,38 +153,32 @@ def search_wikipedia(title: str, language: str, page: int = 0) -> Dict[str, Any]
         "url": wiki_page.fullurl
     }
 
-def perform_fuzzy_search(title: str, language: str, max_results: int = 5) -> List[Dict[str, str]]:
+def perform_fuzzy_search(title: str, language: str) -> List[Dict[str, str]]:
     """
-    Perform a fuzzy search using Wikipedia API's search function.
-    
+    Perform fuzzy search using Wikipedia's search API.
+
     Args:
-        title: The search query
+        title: Search query
         language: Language code
-        max_results: Maximum number of results to return
-        
+
     Returns:
-        List of dictionaries with search results
+        List of search results with title, description, URL, and snippet
     """
     wiki_wiki = wikipediaapi.Wikipedia(
         language=language,
         extract_format=wikipediaapi.ExtractFormat.WIKI,
         user_agent='WikipediaSynthesizer/1.0'
     )
-    
-    # Use search method to find articles related to the title
+
     wikipedia.set_lang(language)
     search_results = wikipedia.search(title)
-    
-    # Format results as a list of dictionaries
+
     formatted_results = []
     for result_title in search_results:
         try:
-            # Get the article page
             page = wiki_wiki.page(result_title)
-            
-            # Get a snippet of the article content
             snippet = page.summary[:150] + "..." if len(page.summary) > 150 else page.summary
-            
+
             formatted_results.append({
                 "title": result_title,
                 "description": snippet,
@@ -194,7 +187,7 @@ def perform_fuzzy_search(title: str, language: str, max_results: int = 5) -> Lis
             })
         except Exception as e:
             print(f"Error retrieving page for {result_title}: {e}")
-    
+
     return formatted_results
 
 # Claude evaluation prompt for selecting the best result
@@ -245,7 +238,7 @@ def evaluate_search_results(client, user_query: str, search_results: List[Dict[s
     try:
         # Make API call to Claude
         response = client.messages.create(
-            model="claude-3-7-sonnet-latest",
+            model="claude-4-5-haiku-latest",
             max_tokens=1000,
             messages=[
                 {"role": "user", "content": prompt}

@@ -1,115 +1,157 @@
 #!/usr/bin/env python3
 """
-Frontend for Wikipedia Synthesizer
+Linguapedia Web Frontend
 
-This Flask application provides a web interface for the Wikipedia Synthesizer
-that combines articles from different languages.
+A Flask web interface for synthesizing Wikipedia articles from multiple
+language editions using Claude AI.
 """
 
 from flask import Flask, render_template, request, redirect, url_for, jsonify, session, send_file
-import backend  # Import your updated backend.py
+import backend
 from anthropic import Anthropic
 import os
 import uuid
 import threading
-import time
 import datetime
 import re
-from urllib.parse import quote_plus
 from fuzzy_cache_match import find_fuzzy_cache_match
-from wikipedia_fuzzy_search import get_last_searched_title
+from langcodes import Language
 
 # Initialize Flask app
 app = Flask(__name__)
-app.secret_key = os.urandom(24)  # For session management
+app.secret_key = os.urandom(24)
 
-# In-memory storage for jobs (would use a database in production)
+# In-memory storage (use database in production)
 jobs = {}
-
-# Mapping between permanent slugs and job IDs
 slug_to_job = {}
 
 # Create Anthropic client
 client = Anthropic(api_key=os.getenv("CLAUDE_API_KEY"))
 
-def create_slug(title, language):
-    """Create a permanent slug from title and language"""
-    # Normalize title: lowercase, replace spaces with hyphens, remove special chars
+# Available languages
+LANGUAGES = [
+    {"code": "en", "name": "English", "count": "Synthesize an article"},
+    {"code": "ja", "name": "日本語", "count": "記事を合成する"},
+    {"code": "ru", "name": "Русский", "count": "Синтезировать статью"},
+    {"code": "de", "name": "Deutsch", "count": "Artikel synthetisieren"},
+    {"code": "es", "name": "Español", "count": "Sintetizar un artículo"},
+    {"code": "fr", "name": "Français", "count": "Synthétiser un article"},
+    {"code": "zh", "name": "中文", "count": "综合文章"},
+    {"code": "it", "name": "Italiano", "count": "Sintetizzare un articolo"},
+    {"code": "pt", "name": "Português", "count": "Sintetizar um artigo"},
+    {"code": "pl", "name": "Polski", "count": "Zsyntetyzuj artykuł"}
+]
+
+def create_slug(title: str, language: str) -> str:
+    """Create a permanent slug from title and language."""
     title_slug = re.sub(r'[^a-zA-Z0-9\s-]', '', title.lower()).strip()
     title_slug = re.sub(r'[\s-]+', '-', title_slug)
-    # Format as language/article_name
-    full_slug = f"{language}/{title_slug}"
-    return full_slug
+    return f"{language}/{title_slug}"
+
+def get_language_display_name(lang_code: str, display_lang: str = 'en') -> str:
+    """
+    Get a formatted language name for display.
+
+    Args:
+        lang_code: ISO language code (e.g., 'ko', 'ar', 'en')
+        display_lang: Language to display the name in (default: 'en')
+
+    Returns:
+        Formatted string like "한국어 (Korean)" or "العربية (Arabic)"
+    """
+    try:
+        lang = Language.get(lang_code)
+        # Get the language name in the display language
+        display_name = lang.display_name(display_lang)
+        # Get the autonym (native name)
+        autonym = lang.autonym()
+
+        # If they're the same, just return one
+        if display_name.lower() == autonym.lower():
+            return display_name
+
+        # Return formatted as "Native Name (English Name)"
+        return f"{autonym} ({display_name})"
+    except:
+        # Fallback to uppercase code if langcodes fails
+        return lang_code.upper()
+
+# Register the function as a Jinja filter
+app.jinja_env.filters['language_name'] = get_language_display_name
+
 
 @app.route('/')
 def index():
-    """Render the search page"""
-    languages = [
-      {"code": "en", "name": "English", "count": "Synthesize an article"},
-      {"code": "ja", "name": "日本語", "count": "記事を合成する"},
-      {"code": "ru", "name": "Русский", "count": "Синтезировать статью"},
-      {"code": "de", "name": "Deutsch", "count": "Artikel synthetisieren"},
-      {"code": "es", "name": "Español", "count": "Sintetizar un artículo"},
-      {"code": "fr", "name": "Français", "count": "Synthétiser un article"},
-      {"code": "zh", "name": "中文", "count": "综合文章"},
-      {"code": "it", "name": "Italiano", "count": "Sintetizzare un articolo"},
-      {"code": "pt", "name": "Português", "count": "Sintetizar um artigo"},
-      {"code": "pl", "name": "Polski", "count": "Zsyntetyzuj artykuł"}
-    ]
-    
-    # Update the session with recent articles
+    """Render the main search page."""
     update_recent_articles_in_session()
-    
-    # Get recent articles from session
     recent_articles = session.get('recent_articles', [])
-    
-    return render_template('index.html', languages=languages, recent_articles=recent_articles)
+    return render_template('index.html', languages=LANGUAGES, recent_articles=recent_articles)
 
 def update_recent_articles_in_session():
-    """
-    This function should only be called within a request context.
-    It updates the session with recent articles from our in-memory storage.
-    """
-    # Get completed jobs and their article info
+    """Update session with recent completed articles (top 10)."""
     completed_articles = []
     for job in jobs.values():
         if job['status'] == 'completed' and 'article_info' in job:
-            # Add permanent slug to article info for linking
             article_info = job['article_info'].copy()
             article_info['slug'] = job.get('slug', create_slug(job['title'], job['language']))
             completed_articles.append(article_info)
-    
-    # Sort by date (newest first) and limit to 10
+
     sorted_articles = sorted(completed_articles, key=lambda x: x['date'], reverse=True)[:10]
-    
-    # Update the session
     session['recent_articles'] = sorted_articles
+
+def create_job_from_cache(cache_path: str, title: str, language: str, max_translations: int = 5):
+    """Create a job entry from a cached article."""
+    job_id = str(uuid.uuid4())
+    cache_date = datetime.datetime.fromtimestamp(os.path.getmtime(cache_path))
+
+    with open(cache_path, 'r', encoding='utf-8') as f:
+        cached_content = f.read()
+
+    slug = create_slug(title, language)
+
+    jobs[job_id] = {
+        'id': job_id,
+        'slug': slug,
+        'title': title,
+        'language': language,
+        'max_translations': max_translations,
+        'status': 'completed',
+        'progress': 100,
+        'result': cached_content,
+        'error': None,
+        'article_info': {
+            'title': title,
+            'language': language,
+            'date': cache_date.strftime('%Y-%m-%d %H:%M:%S'),
+            'from_cache': True,
+            'cache_path': cache_path
+        }
+    }
+
+    slug_to_job[slug] = job_id
+    return slug
+
 
 @app.route('/search', methods=['POST'])
 def search():
-    """Handle the search form submission with fuzzy search and cache matching"""
+    """Handle article search and synthesis requests."""
     title = request.form.get('title')
     language = request.form.get('language', 'en')
     max_translations = 5
     no_cache = request.form.get('no_cache') == 'false'
-    
+
     if not title:
         return redirect(url_for('index'))
-    
-    # Create a permanent slug - this will be updated if fuzzy search finds a different article
+
     slug = create_slug(title, language)
-    
-    # Check if we already have a job for this slug
+    article_name = slug.split('/', 1)[1]
+
+    # Check for existing job
     if slug in slug_to_job and slug_to_job[slug] in jobs:
-        existing_job_id = slug_to_job[slug]
-        existing_job = jobs[existing_job_id]
-        
-        # If job is completed or in progress, redirect to it
+        existing_job = jobs[slug_to_job[slug]]
         if existing_job['status'] in ['completed', 'processing', 'queued']:
-            if existing_job['status'] == 'completed':
-                return redirect(url_for('view_article', language=language, article_name=slug.split('/', 1)[1]))
-            else:
-                return redirect(url_for('article_status', language=language, article_name=slug.split('/', 1)[1]))
+            endpoint = 'view_article' if existing_job['status'] == 'completed' else 'article_status'
+            return redirect(url_for(endpoint, language=language, article_name=article_name))
     
     # Check cache first unless no-cache is specified
     if not no_cache:
@@ -122,37 +164,21 @@ def search():
                 client, title, language, backend.CACHE_DIR
             )
 
-            print("WHAT",should_redirect, fuzzy_cache_path)
-            
             if should_redirect and fuzzy_cache_path:
-                # Extract article name from the path
-                cache_key = os.path.basename(fuzzy_cache_path).replace('.html', '')
-                if '/' in cache_key:
-                    # Handle nested paths
-                    cache_key = '/'.join(os.path.normpath(fuzzy_cache_path).split(os.sep)[-2:])
-                    cache_key = cache_key.replace('.html', '')
-                
-                # Parse the article name from the cache key
-                if '/' in cache_key:
-                    actual_language, article_name = cache_key.split('/', 1)
-                else:
-                    actual_language = language
-                    article_name = cache_key
-                
-                # Create friendly title from article_name
+                # Extract cache key from path
+                cache_key = '/'.join(os.path.normpath(fuzzy_cache_path).split(os.sep)[-2:]).replace('.html', '')
+                actual_language, article_name = cache_key.split('/', 1) if '/' in cache_key else (language, cache_key)
                 friendly_title = article_name.replace('_', ' ').title()
-                
-                # Create a "completed" job for the existing cached article
+
+                # Create job for fuzzy match
                 job_id = str(uuid.uuid4())
                 cache_date = datetime.datetime.fromtimestamp(os.path.getmtime(fuzzy_cache_path))
-                
+
                 with open(fuzzy_cache_path, 'r', encoding='utf-8') as f:
                     cached_content = f.read()
-                
-                # Create the redirected slug
+
                 redirected_slug = f"{actual_language}/{article_name}"
-                
-                # Record the fuzzy match details
+
                 jobs[job_id] = {
                     'id': job_id,
                     'slug': redirected_slug,
@@ -175,68 +201,28 @@ def search():
                         'match_rationale': rationale
                     }
                 }
-                
-                # Map the redirected slug to this job
+
                 slug_to_job[redirected_slug] = job_id
-                
-                # Add a notification about the redirect in the session
+
+                # Add notification
                 if 'notifications' not in session:
                     session['notifications'] = []
-                
                 session['notifications'].append({
                     'type': 'info',
-                    'message': f'Redirected from "{title}" to the similar article "{friendly_title}" (confidence: {confidence:.0%})'
+                    'message': f'Redirected from "{title}" to "{friendly_title}" (confidence: {confidence:.0%})'
                 })
-                
-                # Update recent articles
+
                 update_recent_articles_in_session()
-                
-                # Redirect to the article page
                 return redirect(url_for('view_article', language=actual_language, article_name=article_name))
             
-            # If we got here, no fuzzy match was found
-            cached_path = None
-            
         if cached_path:
-            # Create a "completed" job for the cached article
-            job_id = str(uuid.uuid4())
-            cache_date = datetime.datetime.fromtimestamp(os.path.getmtime(cached_path))
-            
-            with open(cached_path, 'r', encoding='utf-8') as f:
-                cached_content = f.read()
-            
-            jobs[job_id] = {
-                'id': job_id,
-                'slug': slug,
-                'title': title,
-                'language': language,
-                'max_translations': max_translations,
-                'status': 'completed',
-                'progress': 100,
-                'result': cached_content,
-                'error': None,
-                'article_info': {
-                    'title': title,
-                    'language': language,
-                    'date': cache_date.strftime('%Y-%m-%d %H:%M:%S'),
-                    'from_cache': True,
-                    'cache_path': cached_path
-                }
-            }
-            
-            # Map the slug to this job
-            slug_to_job[slug] = job_id
-            
-            # Add to recent articles
+            create_job_from_cache(cached_path, title, language, max_translations)
             update_recent_articles_in_session()
-            
-            # Redirect to the article page
-            return redirect(url_for('view_article', language=language, article_name=slug.split('/', 1)[1]))
+            return redirect(url_for('view_article', language=language, article_name=article_name))
     
-    # Create a job ID
+    # Create new synthesis job
     job_id = str(uuid.uuid4())
-    
-    # Initialize job
+
     jobs[job_id] = {
         'id': job_id,
         'slug': slug,
@@ -248,22 +234,17 @@ def search():
         'result': None,
         'error': None,
         'from_cache': False,
-        'original_query': title  # Store the original query for reference
+        'original_query': title
     }
-    
-    # Map the slug to this job
+
     slug_to_job[slug] = job_id
-    
-    # Start the synthesis process in a background thread
-    thread = threading.Thread(
-        target=process_job,
-        args=(job_id, title, language, max_translations, no_cache)
-    )
+
+    # Start background processing
+    thread = threading.Thread(target=process_job, args=(job_id, title, language, max_translations, no_cache))
     thread.daemon = True
     thread.start()
-    
-    # Redirect to status page
-    return redirect(url_for('article_status', language=language, article_name=slug.split('/', 1)[1]))
+
+    return redirect(url_for('article_status', language=language, article_name=article_name))
 
 # Modify the process_job function to handle fuzzy search results
 def process_job(job_id, title, language, max_translations, no_cache=False):
@@ -300,117 +281,81 @@ def process_job(job_id, title, language, max_translations, no_cache=False):
                 # It will be called when the user views the article
                 return
         
-        # Step 1: Get the original article with fuzzy search
+        # Step 1: Retrieve Wikipedia article with fuzzy search
         jobs[job_id]['progress'] = 5
         original_text, langlinks = backend.get_wikipedia_article_with_tool(client, title, language, True)
-        
+
         if not original_text or not langlinks:
             raise Exception(f"Could not find article '{title}' in {language}")
-        
-        # If fuzzy search used a different title, update the job
-        #actual_title = title  # Direct import from wiki_fuzzy_search
-        #if actual_title and actual_title != title:
-            # Update job's title and slug
-        #    jobs[job_id]['title'] = title
-        #    new_slug = create_slug(title, language)
-        #    old_slug = jobs[job_id]['slug']
-        #    jobs[job_id]['slug'] = new_slug
-            
-            # Update slug mapping - safely remove old mapping if it exists
-        #    if old_slug in slug_to_job and slug_to_job[old_slug] == job_id:
-        #        del slug_to_job[old_slug]
-                
-            # Add new mapping
-        #    slug_to_job[new_slug] = job_id
-            
-            # Add notification that fuzzy search was used
-        #    jobs[job_id]['fuzzy_search_used'] = True
-        #    jobs[job_id]['original_query'] = title  # Keep track of what user searched for
-            
-        #    print(f"Fuzzy search: '{title}' → '{actual_title}'")
-        
+
         jobs[job_id]['progress'] = 10
         
         # Step 2: Select relevant languages
         jobs[job_id]['progress'] = 20
         relevant_languages = backend.select_relevant_languages(
-            client, 
-            jobs[job_id]['title'],  # Use potentially updated title
-            language, 
-            langlinks, 
+            client,
+            jobs[job_id]['title'],
+            language,
+            langlinks,
             max_translations=max_translations
         )
-
-        # Store the selected languages in the job
         jobs[job_id]['selected_languages'] = relevant_languages
+
+        # Prepare translations list
+        translations = [(ll["language"], ll["title"]) for ll in langlinks if ll["language"] in relevant_languages]
+        translations.append((language, jobs[job_id]['title']))
         
-        # Create a list of tuples for selected languages
-        translations = []
-        for lang_link in langlinks:
-            if lang_link["language"] in relevant_languages:
-                translations.append((lang_link["language"], lang_link["title"]))
-        
-        # Add the source language
-        translations.append((language, jobs[job_id]['title']))  # Use potentially updated title
-        
-        # Step 3: Get translation content
+        # Step 3: Retrieve translation content
         jobs[job_id]['progress'] = 30
-        translation_content = backend.get_translation_content_with_tool(client, translations)
-        
-        # Step 4: Translate articles
+        translation_content = backend.get_translation_content_with_tool(translations)
+
+        # Step 4: Translate articles in parallel
         jobs[job_id]['progress'] = 40
-        translated_articles = {}
-        
-        # Add the original language version first
-        translated_articles[language] = original_text
-        
-        # Prepare arguments for parallel processing
-        translation_args = []
-        for lang, content in translation_content.items():
-            if lang != language:  # Skip source language
-                translation_args.append((client, content, lang, language, lang))
-        
-        # Use backend's parallel translation
+        translated_articles = {language: original_text}
+
+        translation_args = [
+            (client, content, language, lang)
+            for lang, content in translation_content.items()
+            if lang != language
+        ]
+
         with backend.ThreadPool(min(10, len(translation_args))) as pool:
-            # Map worker function to arguments
             results = pool.map(backend.translate_article_worker, translation_args)
-            
-            # Process results and update progress incrementally
+
             for i, (lang, translated) in enumerate(results):
                 progress_increment = 30 / max(1, len(translation_args))
-                jobs[job_id]['progress'] = min(70, 40 + int((i+1) * progress_increment))
-                
+                jobs[job_id]['progress'] = min(70, 40 + int((i + 1) * progress_increment))
+
                 if translated is not None:
                     translated_articles[lang] = translated
         
-        # Step 5: Synthesize
+        # Step 5: Synthesize final article
         jobs[job_id]['progress'] = 80
         synthesized_article = backend.synthesize_with_claude(
-            client, translated_articles, language, jobs[job_id]['title']  # Use potentially updated title
+            client, translated_articles, language, jobs[job_id]['title']
         )
-        
+
         if synthesized_article.startswith("Synthesis failed:"):
             raise Exception(synthesized_article)
-        
+
         # Save to cache
         cache_path = backend.save_to_cache(jobs[job_id]['title'], language, max_translations, synthesized_article)
-        
-        # Update job with result
-        jobs[job_id]['status'] = 'completed'
-        jobs[job_id]['progress'] = 100
-        jobs[job_id]['result'] = synthesized_article
-        
-        # Store article metadata in the job
-        jobs[job_id]['article_info'] = {
-            'title': jobs[job_id]['title'],  # Use potentially updated title
-            'language': language,
-            'date': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-            'from_cache': False,
-            'cache_path': cache_path
-        }
-        
+
+        # Mark job as completed
+        jobs[job_id].update({
+            'status': 'completed',
+            'progress': 100,
+            'result': synthesized_article,
+            'article_info': {
+                'title': jobs[job_id]['title'],
+                'language': language,
+                'date': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                'from_cache': False,
+                'cache_path': cache_path
+            }
+        })
+
     except Exception as e:
-        # Handle errors
         jobs[job_id]['status'] = 'error'
         jobs[job_id]['error'] = str(e)
         print(f"Error in job {job_id}: {e}")
@@ -480,21 +425,7 @@ def view_article(language, article_name):
         job_id = slug_to_job[slug]
         if job_id in jobs and jobs[job_id]['status'] == 'completed':
             job = jobs[job_id]
-            
-            # Define all available languages with names
-            all_languages = [
-                {"code": "en", "name": "English"},
-                {"code": "ja", "name": "日本語"},
-                {"code": "ru", "name": "Русский"},
-                {"code": "de", "name": "Deutsch"},
-                {"code": "es", "name": "Español"},
-                {"code": "fr", "name": "Français"},
-                {"code": "zh", "name": "中文"},
-                {"code": "it", "name": "Italiano"},
-                {"code": "pt", "name": "Português"},
-                {"code": "pl", "name": "Polski"},
-            ]
-            
+
             # Get the selected languages from the job if available
             selected_languages = job.get('selected_languages', [])
             
@@ -505,14 +436,14 @@ def view_article(language, article_name):
             from_cache = job.get('article_info', {}).get('from_cache', False)
             cache_path = job.get('article_info', {}).get('cache_path', None)
             
-            return render_template('article.html', 
-                                  article=job['result'], 
+            return render_template('article.html',
+                                  article=job['result'],
                                   title=job['title'],
                                   language=job['language'],
                                   max_translations=job['max_translations'],
                                   now=datetime.datetime.now(),
-                                  languages=all_languages,
-                                  all_languages=all_languages,
+                                  languages=LANGUAGES,
+                                  all_languages=LANGUAGES,
                                   selected_languages=selected_languages,
                                   from_cache=from_cache,
                                   cache_path=cache_path,

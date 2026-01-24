@@ -1,19 +1,16 @@
 """
-Fuzzy Cache Matching Module for Linguapedia
+Fuzzy Cache Matching Module
 
-This module enhances the caching system by using Claude to determine
-if a search query is similar enough to an existing cached article to 
-redirect to it, rather than creating a new one.
+Uses Claude AI to determine if a search query matches an existing
+cached article, enabling smart redirects instead of duplicate synthesis.
 """
 
 import os
-import re
 import json
 import difflib
 from typing import List, Dict, Optional, Tuple
 from anthropic import Anthropic
 
-# Cache similarity threshold
 SIMILARITY_THRESHOLD = 0.95
 
 # Function to get Claude to evaluate cache matches
@@ -45,115 +42,89 @@ Be relatively conservative in your matching - only suggest a redirect if you're 
 
 def get_cached_articles(cache_dir: str, language: str) -> List[Dict]:
     """
-    Get a list of all cached articles for a specific language.
-    
+    Get list of cached articles for a specific language.
+
     Args:
-        cache_dir: Path to the cache directory
+        cache_dir: Path to cache directory
         language: Language code to filter by
-        
+
     Returns:
-        List of dictionaries with info about cached articles
+        List of cached article metadata
     """
-    cache_dir = cache_dir + "/" + language + "/"
-    
+    lang_cache_dir = os.path.join(cache_dir, language)
 
-    cached_articles = []
-    
-    if not os.path.exists(cache_dir):
-        return cached_articles
-    
-    for filename in os.listdir(cache_dir):
-        path = os.path.join(cache_dir, filename)
-        
-        cached_articles.append({
-            "filename": filename,
-            "path": path,
-        })
+    if not os.path.exists(lang_cache_dir):
+        return []
 
-    return cached_articles
+    return [
+        {"filename": filename, "path": os.path.join(lang_cache_dir, filename)}
+        for filename in os.listdir(lang_cache_dir)
+    ]
 
 def basic_similarity_check(query: str, cached_articles: List[Dict]) -> Optional[Dict]:
     """
-    Perform a basic similarity check using difflib to see if there's a very close match.
-    This can catch obvious cases without needing to call Claude.
-    
+    Quick similarity check using difflib before calling Claude.
+
     Args:
         query: User's search query
         cached_articles: List of cached articles
-        
+
     Returns:
-        Matching article dict if a high-confidence match is found, None otherwise
+        Matching article if high-confidence match found, else None
     """
-    # Normalize the query
     query_normalized = query.lower().strip()
-    
-    # Check for exact matches first
+
     for article in cached_articles:
         article_name_normalized = article["filename"].lower().strip()
-        
-        # If exact match, return immediately
+
+        # Check exact match
         if query_normalized == article_name_normalized:
             return article
-    
-    # Check for high similarity matches
-    for article in cached_articles:
-        article_name_normalized = article["filename"].lower().strip()
-        
-        # Use difflib's SequenceMatcher to get similarity ratio
+
+        # Check high similarity
         similarity = difflib.SequenceMatcher(None, query_normalized, article_name_normalized).ratio()
-        
-        # If very similar, return the match
         if similarity > SIMILARITY_THRESHOLD:
             return article
-    
+
     return None
 
 def claude_cache_match(client: Anthropic, query: str, language: str, cached_articles: List[Dict]) -> Tuple[bool, Optional[Dict], float, str]:
     """
-    Use Claude to determine if the query should redirect to an existing cached article.
-    
+    Use Claude to determine if query should redirect to existing cached article.
+
     Args:
         client: Anthropic client
         query: User's search query
         language: Language code
         cached_articles: List of cached articles
-        
+
     Returns:
         Tuple of (should_redirect, matching_article_dict, confidence, rationale)
     """
     if not cached_articles:
         return False, None, 0.0, "No cached articles available"
-    
-    # Format cached articles for the prompt
-    cached_articles_text = ""
-    for i, article in enumerate(cached_articles):
-        cached_articles_text += f"{i+1}. {article['filename']}\n"
-    
-    # Prepare the prompt
+
+    cached_articles_text = "\n".join(f"{i+1}. {article['filename']}" for i, article in enumerate(cached_articles))
+
     prompt = CACHE_MATCH_PROMPT.format(
         query=query,
         language=language,
         cached_articles=cached_articles_text
     )
-    
+
     try:
-        # Make API call to Claude
         response = client.messages.create(
-            model="claude-3-7-sonnet-latest",
+            model="claude-4-5-haiku-latest",
             max_tokens=1000,
-            messages=[
-                {"role": "user", "content": prompt}
-            ],
+            messages=[{"role": "user", "content": prompt}],
             temperature=0.2
         )
-        
-        # Extract JSON response
+
         response_text = response.content[0].text
-        
-        # Find JSON object in response
+
         import re
         json_match = re.search(r'({[\s\S]*})', response_text)
-        
+
         if json_match:
             try:
                 json_data = json.loads(json_match.group(1))
@@ -161,57 +132,55 @@ def claude_cache_match(client: Anthropic, query: str, language: str, cached_arti
                 article_name = json_data.get("filename", "")
                 confidence = json_data.get("confidence", 0.0)
                 rationale = json_data.get("rationale", "No rationale provided")
-                
-                # Find the matching article dict
+
                 matching_article = None
                 if should_redirect and article_name:
                     for article in cached_articles:
                         if article["filename"].lower() == article_name.lower():
                             matching_article = article
                             break
-                
+
                 return should_redirect, matching_article, confidence, rationale
-                
+
             except json.JSONDecodeError:
                 print(f"Failed to parse JSON response: {response_text}")
         else:
             print(f"Failed to extract JSON from response: {response_text}")
-            
+
     except Exception as e:
         print(f"Error in Claude API call: {e}")
-    
+
     return False, None, 0.0, "Error processing the request"
 
 def find_fuzzy_cache_match(client: Anthropic, query: str, language: str, cache_dir: str) -> Tuple[bool, Optional[str], float, str]:
     """
-    Main function to determine if a query should redirect to an existing cached article.
-    
+    Determine if query should redirect to existing cached article.
+
     Args:
         client: Anthropic client
         query: User's search query
         language: Language code
-        cache_dir: Path to the cache directory
-        
+        cache_dir: Path to cache directory
+
     Returns:
         Tuple of (should_redirect, redirect_path, confidence, rationale)
     """
-    # Get all cached articles for this language
     cached_articles = get_cached_articles(cache_dir, language)
-    
+
     if not cached_articles:
         return False, None, 0.0, "No cached articles available"
-    
-    # Try basic similarity check first for efficiency
+
+    # Try fast similarity check first
     basic_match = basic_similarity_check(query, cached_articles)
     if basic_match:
-        return True, basic_match["path"], 1.0, f"Exact or near-exact match found: {basic_match['filename']}"
-    
-    # If no obvious match, use Claude for more sophisticated matching
+        return True, basic_match["path"], 1.0, f"Exact or near-exact match: {basic_match['filename']}"
+
+    # Use Claude for sophisticated matching
     should_redirect, matching_article, confidence, rationale = claude_cache_match(
         client, query, language, cached_articles
     )
-    
+
     if should_redirect and matching_article:
         return True, matching_article["path"], confidence, rationale
-    
+
     return False, None, confidence, rationale
