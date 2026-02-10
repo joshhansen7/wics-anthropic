@@ -1,0 +1,406 @@
+# Factory Method Pattern
+
+The Factory Method pattern is a [design pattern](/article/en/Design_pattern) in [object-oriented programming](/article/en/Object-oriented_programming) that deals with the problem of creating objects without having to specify their exact classes. Rather than calling a constructor directly, this is accomplished by invoking a factory method to create an object. It is one of the 23 classic design patterns described in the book [Design Patterns](/article/en/Design_Patterns) by the [Gang of Four](/article/en/Gang_of_Four_(software)) (GoF) and is categorized as a [creational pattern](/article/en/Creational_pattern).
+
+The pattern is also known as "Virtual Constructor" in some literature, particularly in the Russian programming community.
+
+## Overview
+
+The factory method design pattern solves problems such as:
+
+* How can an object's subclasses redefine its subsequent and distinct implementation? The pattern involves creation of a factory method within the superclass that defers the object's creation to a subclass's factory method.
+* How can an object's instantiation be deferred to a subclass? Create an object by calling a factory method instead of directly calling a constructor.
+
+This enables the creation of subclasses that can change the way in which an object is created (for example, by redefining which class to instantiate).
+
+Creating an object often requires complex processes not appropriate to include within a composing object. The object's creation may lead to a significant duplication of code, may require information inaccessible to the composing object, may not provide a sufficient level of abstraction, or may otherwise not be part of the composing object's concerns. The Factory Method pattern handles these problems by defining a separate method for creating the objects, which subclasses can then override to specify the derived type of product that will be created.
+
+The Factory Method pattern relies on inheritance, as object creation is delegated to subclasses that implement the factory method to create objects. In this way, it can be viewed as a creational version of the [Template Method pattern](/article/en/Template_method_pattern).
+
+## Definition
+
+According to the GoF book, "Design Patterns: Elements of Reusable Object-Oriented Software", the Factory Method pattern "defines an interface for creating an object, but lets subclasses decide which class to instantiate. Factory method lets a class defer instantiation to subclasses."
+
+## Structure
+
+### UML Class Diagram
+
+The Factory Method pattern involves four roles:
+
+1. **Product**: Defines the interface for objects created by the factory method
+2. **ConcreteProduct**: Implements the Product interface
+3. **Creator**: Declares the factory method that returns a Product object and may include a default implementation 
+4. **ConcreteCreator**: Overrides the factory method to create and return a ConcreteProduct
+
+In a typical UML class diagram, the Creator class that requires a Product object does not instantiate the ConcreteProduct class directly. Instead, the Creator refers to a separate factoryMethod() to create a product object, which makes the Creator independent of the exact concrete class that is instantiated. Subclasses of Creator can redefine which class to instantiate.
+
+### Example Structure
+
+A common example used to explain the pattern is a maze game that can be played in different modes:
+
+* **Room** is the base class for a final product (MagicRoom or OrdinaryRoom).
+* **MazeGame** declares the abstract factory method to produce a base product.
+* **MagicRoom** and **OrdinaryRoom** are subclasses of the base product implementing the final product.
+* **MagicMazeGame** and **OrdinaryMazeGame** are subclasses of MazeGame implementing the factory method producing the final products.
+
+Factory methods thus decouple callers (MazeGame) from the implementation of the concrete classes. This makes the new operator redundant, allows adherence to the [open–closed principle](/article/en/Open–closed_principle), and makes the final product more flexible in the event of change.
+
+## Advantages
+
+1. **Decoupling**: Factory methods decouple their callers from implementations of concrete product classes, which specifically means that no new operator is used in the calling class for instantiation. This is particularly valuable when software libraries evolve during the lifetime of an application - so instances of other classes can be created at a later time without the application having to change.
+
+2. **Meaningful method names**: Many object-oriented programming languages prescribe the name of the constructor. In contrast, a factory method can have a more meaningful name, and there can be multiple factory methods of different names and different semantics. For example, a method `Color.createFromRGB()` can create a color object from RGB values, while a method `Color.createFromHSV()` can create a color object from HSV values. This could not be accomplished with just two constructors, as the methods would have the same signature.
+
+3. **Object creation control**: Factory methods centralize the object creation process, allowing for consistent behavior throughout the program.
+
+4. **Parallel class hierarchies**: Allows establishing connections between parallel class hierarchies.
+
+5. **Improved testability**: The Factory Method Pattern can be used for test-driven development, allowing classes to be placed in tests.
+
+## Disadvantages
+
+1. **Requires subclassing**: The pattern leads to subclass formation. There must be a separate ConcreteCreator subclass for each ConcreteProduct. This can significantly increase the number of classes in the system.
+
+2. **Complexity**: When Factory Methods begin to nest, they can become extremely complex.
+
+3. **Inheritance issues**: While it uses inheritance, it doesn't actually extend the functionality of the parent class. Therefore, this pattern can be seen as potentially misusing the extends relationship. Overusing extends relationships can increase the entropy of a program.
+
+4. **Refactoring challenges**: Refactoring existing classes to use factory methods can break client code that uses constructors directly.
+
+5. **Limited extensibility**: Classes instantiated by factory methods typically have private constructors, which means these classes cannot be easily extended.
+
+## Examples
+
+### Java
+
+This Java example demonstrates the MazeGame example mentioned earlier:
+
+```java
+public abstract class MazeGame {
+    // Template method that uses the factory method
+    public MazeGame() {
+        Room room1 = makeRoom();
+        Room room2 = makeRoom();
+        room1.connect(room2);
+        this.addRoom(room1);
+        this.addRoom(room2);
+    }
+
+    // Factory method
+    protected abstract Room makeRoom();
+    
+    protected void addRoom(Room room) {
+        // Implementation to add room to the game
+    }
+}
+
+public class OrdinaryMazeGame extends MazeGame {
+    @Override
+    protected Room makeRoom() {
+        return new OrdinaryRoom();
+    }
+}
+
+public class MagicMazeGame extends MazeGame {
+    @Override
+    protected Room makeRoom() {
+        return new MagicRoom();
+    }
+}
+
+public abstract class Room {
+    public abstract void connect(Room room);
+}
+
+public class OrdinaryRoom extends Room {
+    @Override
+    public void connect(Room room) {
+        // Implementation for connecting ordinary rooms
+    }
+}
+
+public class MagicRoom extends Room {
+    @Override
+    public void connect(Room room) {
+        // Implementation for connecting magic rooms with teleportation
+    }
+}
+```
+
+### C#
+
+```csharp
+public interface IPerson
+{
+    string GetName();
+}
+
+public class Villager : IPerson
+{
+    public string GetName()
+    {
+        return "Village Person";
+    }
+}
+
+public class CityPerson : IPerson
+{
+    public string GetName()
+    {
+        return "City Person";
+    }
+}
+
+public enum PersonType
+{
+    Rural,
+    Urban
+}
+
+public class PersonFactory
+{
+    public IPerson GetPerson(PersonType type)
+    {
+        switch (type)
+        {
+            case PersonType.Rural:
+                return new Villager();
+            case PersonType.Urban:
+                return new CityPerson();
+            default:
+                throw new ArgumentException("Invalid person type");
+        }
+    }
+}
+```
+
+### Python
+
+```python
+from abc import ABC, abstractmethod
+
+class MazeGame(ABC):
+    def __init__(self):
+        room1 = self.make_room()
+        room2 = self.make_room()
+        room1.connect(room2)
+        self.add_room(room1)
+        self.add_room(room2)
+        
+    @abstractmethod
+    def make_room(self):
+        pass
+        
+    def add_room(self, room):
+        print(f"Added room: {room}")
+        
+class OrdinaryMazeGame(MazeGame):
+    def make_room(self):
+        return OrdinaryRoom()
+        
+class MagicMazeGame(MazeGame):
+    def make_room(self):
+        return MagicRoom()
+        
+class Room(ABC):
+    @abstractmethod
+    def connect(self, room):
+        pass
+        
+class OrdinaryRoom(Room):
+    def connect(self, room):
+        print(f"Connecting ordinary room to {room}")
+        
+class MagicRoom(Room):
+    def connect(self, room):
+        print(f"Connecting magic room to {room} with teleportation")
+```
+
+### Japanese Example (List Sorting)
+
+The Japanese Wikipedia article provides an example demonstrating how to display list elements in various orders using the Factory Method pattern:
+
+```java
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
+// Product
+interface Comparator<T> {
+    int compare(T o1, T o2);
+}
+
+// Abstract Creator
+abstract class ListPrinter {
+    // Factory Method
+    protected abstract Comparator<String> createComparator();
+    
+    // Template Method that uses the Factory Method
+    public void printList(List<String> list) {
+        List<String> sortedList = new ArrayList<>(list);
+        Collections.sort(sortedList, createComparator());
+        for (String item : sortedList) {
+            System.out.println(item);
+        }
+    }
+}
+
+// Concrete Creator 1
+class JapaneseAlphabeticalPrinter extends ListPrinter {
+    @Override
+    protected Comparator<String> createComparator() {
+        return new Comparator<String>() {
+            @Override
+            public int compare(String s1, String s2) {
+                return s1.compareTo(s2); // Japanese alphabetical order
+            }
+        };
+    }
+}
+
+// Concrete Creator 2
+class LengthOrderPrinter extends ListPrinter {
+    @Override
+    protected Comparator<String> createComparator() {
+        return new Comparator<String>() {
+            @Override
+            public int compare(String s1, String s2) {
+                return Integer.compare(s1.length(), s2.length()); // Length order
+            }
+        };
+    }
+}
+```
+
+This program would output the list items sorted in different ways depending on which concrete ListPrinter subclass is used.
+
+## Variants of Factory Method
+
+### Static Factory Method
+
+Outside the strict GoF definition, the term "factory method" is often used more broadly to refer to static methods that create objects. This is not technically the Factory Method pattern as defined by GoF, as it doesn't involve inheritance or polymorphism. However, these static creation methods are widely used in practice and offer some of the same benefits:
+
+```java
+public class Complex {
+    private final double real;
+    private final double imaginary;
+    
+    private Complex(double real, double imaginary) {
+        this.real = real;
+        this.imaginary = imaginary;
+    }
+    
+    // Static factory methods
+    public static Complex fromCartesian(double real, double imaginary) {
+        return new Complex(real, imaginary);
+    }
+    
+    public static Complex fromPolar(double magnitude, double angle) {
+        return new Complex(
+            magnitude * Math.cos(angle),
+            magnitude * Math.sin(angle)
+        );
+    }
+}
+```
+
+In this example, using static factory methods with descriptive names provides more clarity than using multiple constructors with the same parameter signatures.
+
+### Simple Factory (Factory Method as Pattern)
+
+A simple factory is a variant where a single class encapsulates the logic for choosing which concrete product to create:
+
+```java
+public class ImageReaderFactory {
+    public static ImageReader createImageReader(File file) {
+        String extension = getFileExtension(file.getName());
+        if (extension.equals("jpg")) {
+            return new JPEGReader(file);
+        } else if (extension.equals("png")) {
+            return new PNGReader(file);
+        } else if (extension.equals("gif")) {
+            return new GIFReader(file);
+        } else {
+            throw new IllegalArgumentException("Unsupported image format");
+        }
+    }
+    
+    private static String getFileExtension(String fileName) {
+        int i = fileName.lastIndexOf('.');
+        if (i > 0) {
+            return fileName.substring(i + 1);
+        }
+        return "";
+    }
+}
+```
+
+## Real-world Uses
+
+The Factory Method pattern is widely used in popular frameworks and libraries:
+
+1. In ADO.NET, `IDbCommand.CreateParameter` is an example of the use of factory method to connect parallel class hierarchies.
+
+2. In Qt, `QMainWindow::createPopupMenu` is a factory method declared in a framework that can be overridden in application code.
+
+3. In Java, several factories are used in the `javax.xml.parsers` package, such as `javax.xml.parsers.DocumentBuilderFactory` or `javax.xml.parsers.SAXParserFactory`.
+
+4. In the HTML5 DOM API, the `Document` interface contains a `createElement()` factory method for creating specific elements of the `HTMLElement` interface.
+
+## When to Use
+
+The Factory Method pattern is suitable in these scenarios:
+
+1. When a class cannot anticipate the type of objects it must create
+2. When a class wants its subclasses to specify the objects it creates
+3. When classes delegate responsibility to one of several helper subclasses, and you want to localize the knowledge of which helper subclass is chosen
+4. When object creation requires complex initialization or configuration
+5. When there are complex dependencies between object creation
+6. When you need to implement the [dependency inversion principle](/article/en/Dependency_inversion_principle)
+7. When you need centralized management of object lifecycle
+8. When unit testing requires mock objects to be substituted for real objects
+
+## Difference from Abstract Factory Pattern
+
+While both the Factory Method pattern and the [Abstract Factory pattern](/article/en/Abstract_factory_pattern) deal with object creation, they are different:
+
+1. **Classification**: In the GoF book, the Factory Method pattern is classified as a "class pattern" (involving inheritance), while the Abstract Factory pattern is classified as an "object pattern" (involving object composition).
+
+2. **Relationship**: The Factory Method pattern is a relationship between the parent Creator class and the child ConcreteCreator class, where the Creator class delegates object creation to the ConcreteCreator class. The Abstract Factory pattern is a relationship between objects, where a Client instance delegates object creation to a ConcreteFactory instance.
+
+3. **Purpose**: Factory Method focuses on deferring the creation of a single product to subclasses, while Abstract Factory focuses on creating families of related products.
+
+4. **Implementation**: Factory Method is typically implemented using inheritance (subclassing), while Abstract Factory is typically implemented using composition.
+
+## Related Patterns
+
+1. **[Abstract Factory Pattern](/article/en/Abstract_factory_pattern)**: Abstract factories are often implemented using factory methods.
+
+2. **[Template Method Pattern](/article/en/Template_method_pattern)**: Factory methods are typically called from template methods.
+
+3. **[Builder Pattern](/article/en/Builder_pattern)**: Another creational pattern for complex object construction.
+
+4. **[Singleton Pattern](/article/en/Singleton_pattern)**: Factory methods can be used to implement singletons.
+
+5. **[Prototype Pattern](/article/en/Prototype_pattern)**: Can be used as an alternative to Factory Method to create objects.
+
+6. **[Joshua Bloch's](/article/en/Joshua_Bloch) Static Factory Method**: A related but different concept described in his book "Effective Java", for which Bloch claims there is no direct equivalent in the GoF Design Patterns book.
+
+## References
+
+1. Gamma, Erich; Helm, Richard; Johnson, Ralph; Vlissides, John. Design Patterns: Elements of Reusable Object-Oriented Software. Addison-Wesley. 1994. ISBN 0-201-63361-2.
+
+2. Martin Fowler; Kent Beck; John Brant; William Opdyke; Don Roberts. Refactoring: Improving the Design of Existing Code. Addison-Wesley. 1999-06. ISBN 0-201-48567-2.
+
+3. Cox, Brad J. Object-oriented programming: an evolutionary approach. Addison-Wesley. 1986. ISBN 978-0-201-10393-9.
+
+4. Cohen, Tal; Gil, Joseph. Better Construction with Factories (PDF). Journal of Object Technology (Bertrand Meyer). 2007, 6 (6): 103 [2007-03-12]. doi:10.5381/jot.2007.6.6.a3.
+
+5. Allen Holub. "Holub on Patterns: Learning Design Patterns by Looking at Code". Apress, 2004. ISBN 978-1590593882.
+
+## External Links
+
+* [Factory Method Pattern Implementation in Java](https://sourcemaking.com/design_patterns/factory_method)
+* [Factory Method in UML and in LePUS3 (a Design Description Language)](https://essex-university.academia.edu/EpaminondasGasparis)
+* [Consider Static Factory Methods by Joshua Bloch](https://www.informit.com/articles/article.aspx?p=1216151&seqNum=3)

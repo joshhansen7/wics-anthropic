@@ -1,0 +1,141 @@
+# AlphaFold
+
+AlphaFold è un programma di intelligenza artificiale (AI) sviluppato da [DeepMind](/article/it/DeepMind), una sussidiaria di [Alphabet](/article/it/Alphabet_Inc.), che esegue previsioni della struttura proteica. Il programma è progettato utilizzando tecniche di [apprendimento profondo](/article/it/Deep_learning).
+
+## Storia e versioni
+
+### AlphaFold 1 (2018)
+
+AlphaFold 1 si è classificato al primo posto nella classifica generale della 13ª [Critical Assessment of Structure Prediction](/article/it/CASP) (CASP) nel dicembre 2018. Il programma ha avuto particolare successo nel prevedere le strutture più accurate per i target valutati come più difficili dagli organizzatori della competizione, per i quali non erano disponibili strutture template esistenti da proteine con sequenze parzialmente simili.
+
+AlphaFold 1 è stato costruito sulla base del lavoro sviluppato da vari team negli anni 2010, ricerche che esaminavano le grandi banche dati di sequenze DNA correlate disponibili da molti organismi diversi (la maggior parte senza strutture 3D note), per cercare di trovare cambiamenti in diversi residui (peptidi) che sembravano essere correlati, anche se i residui non erano consecutivi nella catena principale. Tali correlazioni suggerivano che i residui potessero essere fisicamente vicini l'uno all'altro, anche se non vicini nella sequenza, permettendo di stimare una mappa di contatto. Basandosi su lavori recenti precedenti al 2018, AlphaFold 1 ha esteso questo concetto stimando una distribuzione di probabilità per le distanze tra i residui, trasformando efficacemente la mappa di contatto in una mappa di distanza e utilizzando metodi di apprendimento più avanzati rispetto al passato per sviluppare l'inferenza.
+
+Nel gennaio 2020, implementazioni e codice illustrativo di AlphaFold 1 sono stati rilasciati come open source su [GitHub](/article/it/GitHub).
+
+### AlphaFold 2 (2020)
+
+AlphaFold 2 si è classificato nuovamente al primo posto nella competizione CASP14 nel novembre 2020, raggiungendo un livello di precisione molto più elevato rispetto a qualsiasi altro partecipante. Ha ottenuto punteggi superiori a 90 nel test di distanza globale (GDT) del CASP per circa due terzi delle proteine. Questo test misura la somiglianza tra una struttura prevista computazionalmente e la struttura determinata sperimentalmente, dove 100 rappresenta una corrispondenza completa.
+
+La versione 2020 del programma (AlphaFold 2) è significativamente diversa dalla versione originale che ha vinto CASP13 nel 2018, secondo il team di DeepMind. AlphaFold 1 utilizzava una serie di moduli addestrati separatamente per produrre un potenziale guida, che veniva poi combinato con un potenziale energetico basato sulla fisica. AlphaFold 2 ha sostituito questo approccio con un sistema di sottoreti interconnesse, formando un singolo modello differenziabile end-to-end basato sul riconoscimento di pattern. Questo modello è stato addestrato in modo integrato. Dopo che la previsione della rete neurale converge, una fase finale di raffinamento applica vincoli fisici locali utilizzando la minimizzazione dell'energia basata sul campo di forza AMBER. Questa fase modifica solo leggermente la struttura prevista.
+
+Una parte fondamentale del sistema 2020 sono due moduli, che si ritiene siano basati su un design [transformer](/article/it/Transformer_(modello_di_apprendimento_automatico)), utilizzati per raffinare progressivamente un vettore di informazioni per ogni relazione tra residui di amminoacidi della proteina e tra ciascuna posizione di amminoacido e ciascuna sequenza diversa nell'allineamento di sequenze di input. Internamente, queste trasformazioni di raffinamento contengono strati che hanno l'effetto di aggregare dati rilevanti e filtrare dati irrilevanti per queste relazioni (il "meccanismo di attenzione") in un modo dipendente dal contesto, appreso dai dati di addestramento.
+
+L'inclusione di dati metagenomici ha migliorato la qualità della previsione degli [allineamenti di sequenze multiple](/article/it/Allineamento_multiplo_di_sequenze) (MSA). Una delle maggiori fonti dei dati di addestramento è stato il database personalizzato Big Fantastic Database (BFD) di 65.983.866 famiglie proteiche, rappresentate come MSA e [modelli nascosti di Markov](/article/it/Modello_nascosto_di_Markov) (HMM), che copre 2.204.359.010 sequenze proteiche da database di riferimento, metagenomi e metatrascrittomi.
+
+I dati di addestramento erano originariamente limitati a singole catene peptidiche. Tuttavia, l'aggiornamento dell'ottobre 2021, denominato AlphaFold-Multimer, ha incluso complessi proteici nei suoi dati di addestramento. DeepMind ha dichiarato che questo aggiornamento è riuscito circa il 70% delle volte a prevedere con precisione le interazioni proteina-proteina.
+
+### AlphaFold 3 (2024)
+
+AlphaFold 3 è stato annunciato l'8 maggio 2024. È stato co-sviluppato da Google DeepMind e [Isomorphic Labs](/article/it/Isomorphic_Labs), entrambe sussidiarie di Alphabet. AlphaFold 3 non è limitato alle proteine a catena singola, in quanto può anche prevedere le strutture di complessi proteici con DNA, RNA, modificazioni post-traduzionali e ligandi e ioni selezionati.
+
+AlphaFold 3 introduce il "Pairformer", un'architettura di deep learning ispirata al transformer, considerata simile, ma più semplice dell'Evoformer usato in AlphaFold 2. Le previsioni iniziali del modulo Pairformer vengono raffinate da un modello di diffusione. Questo modello parte da una nuvola di atomi e raffina iterativamente le loro posizioni, guidato dall'output del Pairformer, per generare una rappresentazione 3D della struttura molecolare.
+
+Il nuovo metodo di previsione mostra un miglioramento minimo del 50% nell'accuratezza per le interazioni proteiche con altre molecole rispetto ai metodi esistenti. Inoltre, per alcune categorie chiave di interazioni, l'accuratezza della previsione è effettivamente raddoppiata.
+
+Il server AlphaFold è stato creato per fornire accesso gratuito ad AlphaFold 3 per la ricerca non commerciale. A maggio 2025, l'articolo di ricerca su AlphaFold 3 è stato citato direttamente più di 4000 volte.
+
+## Il problema del ripiegamento proteico
+
+Le proteine sono composte da catene di amminoacidi che si ripiegano spontaneamente per formare le strutture tridimensionali (3D) delle proteine. La struttura 3D è cruciale per comprendere la funzione biologica della proteina.
+
+Le strutture proteiche possono essere determinate sperimentalmente attraverso tecniche come la [cristallografia a raggi X](/article/it/Cristallografia_a_raggi_X), la [microscopia crioelettronica](/article/it/Microscopia_crioelettronica) e la [risonanza magnetica nucleare](/article/it/Risonanza_magnetica_nucleare), che sono tutte costose e richiedono molto tempo. Tali sforzi, utilizzando i metodi sperimentali, hanno identificato le strutture di circa 170.000 proteine negli ultimi 60 anni, mentre ci sono oltre 200 milioni di proteine note in tutte le forme di vita.
+
+Nel corso degli anni, i ricercatori hanno applicato numerosi metodi computazionali per prevedere le strutture 3D delle proteine dalle loro sequenze di amminoacidi. L'accuratezza di tali metodi nel migliore scenario possibile è vicina alle tecniche sperimentali (NMR) mediante l'uso di modellazione per omologia basata sull'evoluzione molecolare. CASP, che è stato lanciato nel 1994 per sfidare la comunità scientifica a produrre le loro migliori previsioni di struttura proteica, ha scoperto che i punteggi GDT di solo circa 40 su 100 potevano essere raggiunti per le proteine più difficili entro il 2016. AlphaFold ha iniziato a competere nel CASP 2018 utilizzando una tecnica di apprendimento profondo di intelligenza artificiale.
+
+## Algoritmo
+
+DeepMind ha addestrato il programma su oltre 170.000 proteine dalla [Protein Data Bank](/article/it/Protein_Data_Bank), un repository pubblico di sequenze e strutture proteiche. Il programma utilizza una forma di rete di attenzione, una tecnica di apprendimento profondo che si concentra sul far identificare all'AI parti di un problema più grande, quindi assemblarle per ottenere la soluzione complessiva. L'addestramento complessivo è stato condotto su una potenza di elaborazione tra 100 e 200 GPU.
+
+## Competizioni
+
+### CASP13
+
+Nel dicembre 2018, AlphaFold di DeepMind si è classificato al primo posto nella classifica generale del 13° Critical Assessment of Techniques for Protein Structure Prediction (CASP).
+
+Il programma è stato particolarmente efficace nel prevedere la struttura più accurata per i target valutati come i più difficili dagli organizzatori della competizione, dove non erano disponibili strutture template esistenti da proteine con una sequenza parzialmente simile. AlphaFold ha fornito la migliore previsione per 25 dei 43 target proteici in questa classe, raggiungendo un punteggio mediano di 58,9 nel test di distanza globale (GDT) del CASP, davanti a 52,5 e 52,4 dei due team successivi, che utilizzavano anche l'apprendimento profondo per stimare le distanze di contatto. Complessivamente, su tutti i target, AlphaFold 1 ha raggiunto un punteggio GDT di 68,5.
+
+### CASP14
+
+Nel novembre 2020, la nuova versione di DeepMind, AlphaFold 2, ha vinto il CASP14. Complessivamente, AlphaFold 2 ha fatto la migliore previsione per 88 dei 97 target.
+
+Sul parametro preferito della competizione, il test di distanza globale (GDT), il programma ha raggiunto un punteggio mediano di 92,4 (su 100), il che significa che più della metà delle sue previsioni sono state valutate migliori del 92,4% per avere i loro atomi più o meno nella posizione corretta, un livello di accuratezza riportato come comparabile alle tecniche sperimentali come la cristallografia a raggi X. Nel 2018, AlphaFold 1 aveva raggiunto questo livello di accuratezza solo in due di tutte le sue previsioni. L'88% delle previsioni nella competizione del 2020 aveva un punteggio GDT_TS superiore a 80. Sul gruppo di target classificati come i più difficili, AlphaFold 2 ha raggiunto un punteggio mediano di 87.
+
+Misurato dalla deviazione quadratica media (RMS-D) del posizionamento degli atomi di carbonio alfa della catena principale proteica, che tende ad essere dominata dalle prestazioni degli outlier peggiori, l'88% delle previsioni di AlphaFold 2 aveva una deviazione RMS inferiore a 4 Å per l'insieme di atomi C-alfa sovrapposti. Il 76% delle previsioni ha raggiunto risultati migliori di 3 Å, e il 46% aveva un'accuratezza RMS degli atomi C-alfa migliore di 2 Å, con una deviazione RMS mediana nelle sue previsioni di 2,1 Å per un insieme di atomi CA sovrapposti. AlphaFold 2 ha anche raggiunto un'accuratezza nella modellazione delle catene laterali superficiali descritta come "davvero davvero straordinaria".
+
+Per validare ulteriormente AlphaFold 2, gli organizzatori della conferenza hanno contattato quattro importanti gruppi sperimentali che lavoravano su strutture che trovavano particolarmente difficili e non erano stati in grado di determinare. In tutti e quattro i casi, i modelli tridimensionali prodotti da AlphaFold 2 erano sufficientemente accurati da determinare le strutture di queste proteine mediante sostituzione molecolare. Questi includevano il target T1100 (Af1503), una piccola proteina di membrana studiata dagli sperimentatori per dieci anni.
+
+Delle tre strutture che AlphaFold 2 ha avuto meno successo nel prevedere, due erano state ottenute mediante metodi di NMR proteica, che definiscono la struttura proteica direttamente in soluzione acquosa, mentre AlphaFold era stato addestrato principalmente su strutture proteiche in cristalli. La terza esiste in natura come un complesso multidominio costituito da 52 copie identiche dello stesso dominio, una situazione che AlphaFold non era programmato per considerare. Per tutti i target con un singolo dominio, escludendo solo una proteina molto grande e le due strutture determinate mediante NMR, AlphaFold 2 ha raggiunto un punteggio GDT_TS superiore a 80.
+
+### CASP15
+
+Nel 2022, DeepMind non ha partecipato al CASP15, ma la maggior parte dei partecipanti ha utilizzato AlphaFold o strumenti che incorporavano AlphaFold.
+
+## Ricezione
+
+Il fatto che AlphaFold 2 abbia ottenuto punteggi superiori a 90 nel test di distanza globale (GDT) del CASP è considerato un risultato significativo nella biologia computazionale e un grande progresso verso una sfida decennale della biologia. Il premio Nobel e biologo strutturale [Venki Ramakrishnan](/article/it/Venkatraman_Ramakrishnan) ha definito il risultato "un progresso straordinario sul problema del ripiegamento proteico", aggiungendo che "è avvenuto decenni prima di quanto molti nel campo avrebbero previsto. Sarà emozionante vedere i molti modi in cui cambierà fondamentalmente la ricerca biologica."
+
+Spinto dai comunicati stampa del CASP e di DeepMind, il successo di AlphaFold 2 ha ricevuto ampia attenzione mediatica. Oltre agli articoli sulla stampa scientifica specializzata, come Nature, Science, MIT Technology Review e New Scientist, la notizia è stata ampiamente coperta dai principali quotidiani nazionali. Un tema frequente era che la capacità di prevedere con precisione le strutture proteiche in base alla sequenza di amminoacidi costituenti dovrebbe avere una vasta gamma di benefici nel campo delle scienze della vita, compresa l'accelerazione della scoperta avanzata di farmaci e una migliore comprensione delle malattie. Alcuni hanno notato che anche una risposta perfetta al problema della previsione proteica lascerebbe ancora domande sul problema del ripiegamento proteico, cioè comprendere in dettaglio come il processo di ripiegamento avvenga effettivamente in natura (e come a volte le proteine possano anche ripiegarsi male).
+
+Nel 2023, [Demis Hassabis](/article/it/Demis_Hassabis) e [John Jumper](/article/it/John_Jumper) hanno vinto il [Breakthrough Prize in Life Sciences](/article/it/Breakthrough_Prize) e l'[Albert Lasker Award for Basic Medical Research](/article/it/Albert_Lasker_Award) per la loro gestione del progetto AlphaFold. Hassabis e Jumper hanno successivamente vinto il [Premio Nobel per la Chimica](/article/it/Premio_Nobel_per_la_Chimica) nel 2024 per il loro lavoro sulla "previsione della struttura proteica" insieme a [David Baker](/article/it/David_Baker_(biologo)) dell'Università di Washington.
+
+## Codice sorgente
+
+L'accesso aperto al codice sorgente di diverse versioni di AlphaFold (escluso AlphaFold 3) è stato fornito da DeepMind dopo le richieste della comunità scientifica. Il codice sorgente di AlphaFold 3 è stato reso disponibile per uso non commerciale alla comunità scientifica su richiesta nel novembre 2024.
+
+## Database di modelli proteici generati da AlphaFold
+
+L'AlphaFold Protein Structure Database, un progetto congiunto tra AlphaFold e [EMBL-EBI](/article/it/European_Bioinformatics_Institute), è stato lanciato il 22 luglio 2021. Al lancio, il database conteneva modelli previsti da AlphaFold per quasi il completo proteoma [UniProt](/article/it/UniProt) di umani e 20 organismi modello, per un totale di oltre 365.000 proteine. Il database non include proteine con meno di 16 o più di 2700 residui di amminoacidi, ma per gli umani sono disponibili nel file batch completo. L'obiettivo iniziale di AlphaFold (a inizio 2022) era di espandere il database per coprire la maggior parte del set UniRef90, che contiene oltre 100 milioni di proteine. Al 15 maggio 2022, il database conteneva 992.316 previsioni.
+
+Nel luglio 2021, UniProt-KB e [InterPro](/article/it/InterPro) sono stati aggiornati per mostrare le previsioni di AlphaFold quando disponibili.
+
+Il 28 luglio 2022, il team ha caricato nel database le strutture di circa 200 milioni di proteine da 1 milione di specie, coprendo quasi ogni proteina conosciuta sul pianeta.
+
+## Limitazioni
+
+AlphaFold ha varie limitazioni:
+
+- AlphaFold DB fornisce modelli di singole catene proteiche (monomeri), piuttosto che i loro complessi biologicamente rilevanti.
+- Molte regioni proteiche sono previste con punteggio di confidenza basso, incluse le regioni proteiche intrinsecamente disordinate.
+- Alphafold-2 è stato validato per prevedere gli effetti strutturali delle mutazioni con un successo limitato.
+- Il modello si basa, in una certa misura, sulle informazioni co-evolutive di proteine simili. Pertanto, potrebbe non funzionare altrettanto bene su proteine sintetiche o proteine con omologia molto bassa rispetto a quelle nel database di addestramento.
+- La capacità del modello di prevedere conformazioni native multiple delle proteine è limitata.
+- La versione AlphaFold 3 può prevedere strutture di complessi proteici con un set molto limitato di cofattori selezionati e modificazioni co- e post-traduzionali. Tra il 50% e il 70% delle strutture del proteoma umano sono incomplete senza glicani legati covalentemente. AlphaFill, un database derivato, aggiunge cofattori ai modelli AlphaFold ove appropriato.
+- Nell'algoritmo, i residui si muovono liberamente, senza vincoli. Pertanto, durante la modellazione l'integrità della catena non viene mantenuta. Di conseguenza, AlphaFold può produrre risultati topologicamente errati, come strutture con un numero arbitrario di nodi.
+
+## Applicazioni
+
+AlphaFold è stato utilizzato per prevedere le strutture delle proteine di [SARS-CoV-2](/article/it/SARS-CoV-2), l'agente causale del [COVID-19](/article/it/COVID-19). Le strutture di queste proteine erano in attesa di rilevamento sperimentale all'inizio del 2020. I risultati sono stati esaminati da scienziati del [Francis Crick Institute](/article/it/Francis_Crick_Institute) nel Regno Unito prima di essere rilasciati alla più ampia comunità di ricerca. Il team ha anche confermato una previsione accurata rispetto alla proteina spike del SARS-CoV-2 determinata sperimentalmente che è stata condivisa nella Protein Data Bank, un database internazionale ad accesso aperto, prima di rilasciare le strutture determinate computazionalmente delle molecole proteiche poco studiate. Il team ha riconosciuto che, sebbene queste strutture proteiche potrebbero non essere oggetto di sforzi di ricerca terapeutica in corso, aggiungeranno alla comprensione della comunità del virus SARS-CoV-2. In particolare, la previsione di AlphaFold 2 della struttura della proteina ORF3a era molto simile alla struttura determinata dai ricercatori dell'Università della California, Berkeley utilizzando la microscopia crioelettronica. Si ritiene che questa specifica proteina aiuti il virus a fuoriuscire dalla cellula ospite una volta che si replica. Si ritiene anche che questa proteina svolga un ruolo nell'innescare la risposta infiammatoria all'infezione.
+
+## Opere pubblicate
+
+- Andrew W. Senior et al. (Dicembre 2019), "Protein structure prediction using multiple deep neural networks in the 13th Critical Assessment of Protein Structure Prediction (CASP13)", Proteins: Structure, Function, Bioinformatics 87(12) 1141–1148 doi:10.1002/prot.25834
+- Andrew W. Senior et al. (15 Gennaio 2020), "Improved protein structure prediction using potentials from deep learning", Nature 577 706–710 doi:10.1038/s41586-019-1923-7
+- John Jumper et al. (Dicembre 2020), "High Accuracy Protein Structure Prediction Using Deep Learning", in Fourteenth Critical Assessment of Techniques for Protein Structure Prediction (Abstract Book), pp. 22–24
+- John Jumper et al. (Dicembre 2020), "AlphaFold 2". Presentazione data al CASP 14.
+- Abramson, J., Adler, J., Dunger, J. et al. (Maggio 2024), "Accurate structure prediction of biomolecular interactions with AlphaFold 3", Nature 630, 493–500 (2024)
+
+## Vedi anche
+
+- [Folding@home](/article/it/Folding@home)
+- [Rosetta@home](/article/it/Rosetta@home)
+- [AlphaGo](/article/it/AlphaGo)
+- [AlphaZero](/article/it/AlphaZero)
+- [Foldit](/article/it/Foldit)
+- [Protein Data Bank](/article/it/Protein_Data_Bank)
+- [Proteina](/article/it/Proteina)
+- [Struttura proteica](/article/it/Struttura_proteica)
+
+## Collegamenti esterni
+
+- [Server web AlphaFold-3](https://alphafold.ebi.ac.uk/)
+- [Codice e link al modello di AlphaFold v2.1 su GitHub](https://github.com/deepmind/alphafold)
+- [Accesso aperto alle previsioni di struttura proteica per il proteoma umano e altri 20 organismi chiave presso l'European Bioinformatics Institute (AlphaFold Protein Structure Database)](https://alphafold.ebi.ac.uk/)
+- [Sito web CASP 14](https://predictioncenter.org/casp14/)
+- [AlphaFold: The making of a scientific breakthrough](https://www.youtube.com/watch?v=gg7WjuFs8F4), DeepMind, via YouTube.
+- [ColabFold](https://colab.research.google.com/github/sokrypton/ColabFold/blob/main/AlphaFold2.ipynb) (Mirdita, Milot; Schütze, Konstantin; Moriwaki, Yoshitaka; Heo, Lim; Ovchinnikov, Sergey; Steinegger, Martin (2022-05-30). "ColabFold: Making protein folding accessible to all". Nature Methods. 19 (6): 679–682. doi:10.1038/s41592-022-01488-1. PMC 9184281. PMID 35637307.), versione per la previsione omooligomerica e complessi.
+
+## Letture consigliate
+
+- Carlos Outeiral, CASP14: what Google DeepMind's AlphaFold 2 really achieved, and what it means for protein folding, biology and bioinformatics, Oxford Protein Informatics Group. (3 Dicembre)
+- Mohammed AlQuraishi, AlphaFold2 @ CASP14: "It feels like one's child has left home." (blog), 8 Dicembre 2020
+- Mohammed AlQuraishi, The AlphaFold2 Method Paper: A Fount of Good Ideas (blog), 25 Luglio 2021

@@ -1,0 +1,331 @@
+# Macchina di Turing
+
+La **macchina di Turing** è un modello matematico di computazione che descrive una macchina astratta in grado di manipolare i dati contenuti su un nastro di lunghezza potenzialmente infinita, secondo un insieme prefissato di regole ben definite. Questo modello, introdotto dal matematico britannico [Alan Turing](/article/it/Alan_Turing) nel 1936, è fondamentale per la [teoria della computabilità](/article/it/Teoria_della_computabilità) e rappresenta la formalizzazione matematica del concetto di [algoritmo](/article/it/Algoritmo).
+
+A dispetto della sua apparente semplicità, la macchina di Turing è in grado di simulare la logica di qualunque algoritmo eseguibile su un computer reale. Essa viene considerata un potente strumento teorico che viene largamente usato nella teoria della [calcolabilità](/article/it/Calcolabilità) e nello studio della [complessità computazionale](/article/it/Complessità_computazionale), in quanto aiuta a comprendere i limiti del calcolo meccanico.
+
+## Storia
+
+### Il contesto storico e le macchine computazionali
+
+Il concetto di "macchina computazionale" ha origini precedenti ai lavori di Turing. [Robin Gandy](/article/it/Robin_Gandy) (1919-1995), studente di Alan Turing e successivamente suo amico per tutta la vita, ne tracciò la discendenza a partire da [Charles Babbage](/article/it/Charles_Babbage) (1834). Gandy propose la "tesi di Babbage": "Che l'intero sviluppo e le operazioni dell'analisi sono ora capaci di essere eseguiti da macchinari."
+
+L'analisi di Gandy del [motore analitico](/article/it/Motore_analitico) di Babbage descrive le seguenti operazioni:
+
+1. Le funzioni aritmetiche +, −, ×
+2. Qualsiasi sequenza di operazioni come un'operazione
+3. Iterazione di un'operazione
+4. Iterazione condizionale
+5. Trasferimento condizionale (goto condizionale)
+
+Gandy sostiene che "le funzioni che possono essere calcolate da (1), (2) e (4) sono precisamente quelle calcolate da Turing". Cita inoltre altre "macchine di calcolo universale", incluse quelle di [Percy Ludgate](/article/it/Percy_Ludgate) (1909), [Leonardo Torres y Quevedo](/article/it/Leonardo_Torres_y_Quevedo) (1914), Maurice d'Ocagne (1922), Louis Couffignal (1933), [Vannevar Bush](/article/it/Vannevar_Bush) (1936), [Howard Aiken](/article/it/Howard_Aiken) (1937).
+
+### L'Entscheidungsproblem e il decimo problema di Hilbert
+
+Uno degli aspetti del decimo problema posto dal matematico [David Hilbert](/article/it/David_Hilbert) nel 1900 era rimasto in sospeso per quasi trent'anni prima di essere formulato con precisione. La formulazione originale di Hilbert era:
+
+"10. Determinazione della risolvibilità di un'equazione diofantea. Data un'equazione diofantea con un numero qualsiasi di incognite e con coefficienti interi razionali: Escogitare un processo secondo il quale si possa determinare in un numero finito di operazioni se l'equazione è risolvibile in interi razionali."
+
+Nel 1928, durante il congresso internazionale dei matematici, Hilbert formulò con maggiore precisione la questione, ponendo tre domande: "Primo, la matematica era completa? Secondo, la matematica era coerente? E terzo, la matematica era decidibile?" Alle prime due domande rispose [Kurt Gödel](/article/it/Kurt_Gödel) nel 1930, mentre la terza - l'[Entscheidungsproblem](/article/it/Entscheidungsproblem) (problema della decisione) - dovette attendere fino alla metà degli anni '30.
+
+Il problema stava nel fatto che una risposta richiedeva una definizione precisa di "prescrizione definita generalmente applicabile", o "calcolabilità effettiva", e nel 1928 non ne esisteva alcuna.
+
+### La macchina di Alan Turing
+
+Nella primavera del 1935, Turing, allora giovane studente presso il [King's College](/article/it/King's_College_Cambridge) di Cambridge, accettò la sfida. Era stato stimolato dalle lezioni del logico [Max Newman](/article/it/Max_Newman) che lo introdusse al lavoro di Gödel e all'Entscheidungsproblem.
+
+L'idea principale di Turing fu che l'Entscheidungsproblem potesse essere risolto attraverso un processo meccanico da una macchina. Secondo il necrologio di Turing scritto da Newman nel 1955: "Alla domanda 'che cos'è un processo meccanico?', Turing diede la caratteristica risposta 'Qualcosa che può essere fatto da una macchina' e si imbarcò nel compito altamente congeniale di analizzare la nozione generale di macchina di calcolo."
+
+Gandy afferma che l'idea principale potrebbe essere stata sia l'analisi del calcolo sia la realizzazione che c'era una macchina universale, con un conseguente argomento diagonale per dimostrare l'insolubilità dell'Entscheidungsproblem.
+
+Turing presentò il suo modello di macchina computazionale nell'articolo "[On Computable Numbers, with an Application to the Entscheidungsproblem](/article/it/On_Computable_Numbers,_with_an_Application_to_the_Entscheidungsproblem)" pubblicato all'inizio del 1937. In questo scritto, per la prima volta concettualizzò quella che chiamò "a-machine" (macchina automatica), che il suo relatore di dottorato, [Alonzo Church](/article/it/Alonzo_Church), in seguito avrebbe chiamato "macchina di Turing" in una recensione.
+
+Con questo modello, Turing fu in grado di rispondere negativamente a due domande:
+
+1. Esiste una macchina che può determinare se una qualsiasi macchina arbitraria sul suo nastro è "circolare" (ad esempio, si blocca o non riesce a continuare il suo compito computazionale)?
+2. Esiste una macchina che può determinare se una qualsiasi macchina arbitraria sul suo nastro stampa mai un dato simbolo?
+
+Fornendo una descrizione matematica di un dispositivo molto semplice capace di calcoli arbitrari, fu in grado di dimostrare proprietà del calcolo in generale, e in particolare la non computabilità dell'Entscheidungsproblem.
+
+### 1937-1970: Il "computer digitale" e la nascita dell'informatica
+
+Nel 1937, mentre era a Princeton e lavorava alla sua tesi di dottorato, Turing costruì un moltiplicatore digitale elettromeccanico, realizzando i propri trasmettitori. "Il compito di Alan era quello di incarnare la progettazione logica di una macchina Turing in una rete di trasmettitori azionati a interruttori..."
+
+Nei primi anni '50 [Hao Wang](/article/it/Hao_Wang) e [Marvin Minsky](/article/it/Marvin_Minsky) ridussero la macchina di Turing a una forma più semplice, mentre i ricercatori europei stavano riducendo il nuovo computer elettronico a un oggetto teorico simile a ciò che veniva chiamata "macchina di Turing".
+
+Alla fine degli anni '50 e all'inizio degli anni '60, gli sviluppi paralleli di diversi ricercatori portarono avanti questo lavoro e ridussero la macchina di Turing a un computer più intuitivo, simile a un modello astratto chiamato "macchina a contatori"; in seguito furono sviluppati modelli di "macchina a registri" e "macchina ad accesso casuale" che fondamentalmente sono tutti "macchine di Turing multi-nastro" con aggiunti set di istruzioni aritmetiche.
+
+### 1970-oggi: la macchina di Turing come modello computazionale
+
+Oggi, le macchine a contatori, a registri e ad accesso casuale e la loro progenitrice, la macchina di Turing, continuano ad essere i modelli di scelta per i teorici che studiano questioni nella teoria della computazione. In particolare, la [teoria della complessità computazionale](/article/it/Teoria_della_complessità_computazionale) fa ampio uso della macchina di Turing.
+
+Due modelli hanno ottenuto una posizione dominante nella teoria della complessità basata sulle macchine:
+- La macchina di Turing multinastro off-line, che rappresenta il modello standard per il calcolo orientato alle stringhe
+- La macchina ad accesso casuale (RAM) di Cook e Reckhow, che assume un ruolo principale nelle aree relative all'analisi degli algoritmi
+
+## Descrizione
+
+### Descrizione informale
+
+La macchina di Turing consiste in:
+
+1. Un **nastro** infinito diviso in celle consecutive. Ogni cella contiene un simbolo appartenente a un alfabeto finito. L'alfabeto include un simbolo speciale chiamato "simbolo bianco" (spesso indicato come '0' o 'B' o '□'), che rappresenta l'assenza di informazioni. Il nastro è considerato arbitrariamente estendibile sia a sinistra che a destra, in modo che la macchina abbia sempre abbastanza spazio per eseguire i suoi calcoli.
+
+2. Una **testina di lettura/scrittura** che può leggere e scrivere simboli sul nastro e spostarsi a sinistra o a destra di una cella per volta.
+
+3. Un **registro di stato** che memorizza lo stato corrente della macchina di Turing. Il numero degli stati possibili è sempre finito, e vi è uno stato speciale detto "stato iniziale", dal quale la macchina inizia la sua esecuzione.
+
+4. Una **tabella di istruzioni** (o funzione di transizione) che indica alla macchina quale simbolo scrivere sul nastro, come spostare la testina (a sinistra, a destra o restare ferma), e a quale stato passare, in funzione del simbolo letto sul nastro e dello stato corrente della macchina. Se nessuna azione è definita per una data combinazione di simbolo letto e stato corrente, la macchina si ferma.
+
+All'inizio del calcolo, il nastro contiene i dati di input (una sequenza finita di simboli), la testina si trova sul primo simbolo dell'input, e la macchina è nello stato iniziale. La macchina procede seguendo le istruzioni della tabella fino a quando non si ferma, se mai lo fa.
+
+### Definizione formale
+
+Una macchina di Turing può essere formalmente definita come una 7-tupla 
+$M = \langle Q, \Gamma, b, \Sigma, \delta, q_0, F \rangle$ dove:
+
+- $Q$ è un insieme finito, non vuoto di stati;
+- $\Gamma$ è un insieme finito, non vuoto di simboli dell'alfabeto del nastro;
+- $b \in \Gamma$ è il simbolo vuoto (l'unico simbolo che può apparire sul nastro infinite volte in qualsiasi fase durante il calcolo);
+- $\Sigma \subseteq \Gamma \setminus \{b\}$ è l'insieme dei simboli di input, cioè l'insieme dei simboli che possono apparire nel contenuto iniziale del nastro;
+- $q_0 \in Q$ è lo stato iniziale;
+- $F \subseteq Q$ è l'insieme degli stati finali o stati di accettazione;
+- $\delta: (Q \setminus F) \times \Gamma \rightharpoonup Q \times \Gamma \times \{L, R, N\}$ è una funzione parziale chiamata funzione di transizione, dove L è spostamento a sinistra, R è spostamento a destra, N è nessuno spostamento.
+
+Se $\delta$ non è definita sullo stato corrente e sul simbolo corrente del nastro, allora la macchina si ferma. Intuitivamente, la funzione di transizione specifica:
+- il nuovo stato a cui passare dallo stato corrente, 
+- quale simbolo sovrascrivere al simbolo corrente puntato dalla testina, e 
+- il prossimo movimento della testina.
+
+### Configurazioni e calcolo
+
+Una **configurazione** di una macchina di Turing descrive lo stato completo della macchina in un determinato momento, comprendendo:
+- lo stato corrente del dispositivo di controllo
+- il contenuto del nastro
+- la posizione della testina di lettura/scrittura
+
+Formalmente, una configurazione può essere rappresentata da una tripla $(q, u, v)$ dove:
+- $q \in Q$ è lo stato corrente
+- $u \in \Gamma^*$ è il contenuto del nastro a sinistra della testina
+- $v \in \Gamma^*$ è il contenuto del nastro a partire dalla posizione corrente della testina
+
+Un **calcolo** è una sequenza di configurazioni successive, dove ogni configurazione porta alla successiva secondo la funzione di transizione $\delta$. Una macchina di Turing **accetta** una parola se, partendo dalla configurazione iniziale con quella parola come input, raggiunge una configurazione in cui è in uno stato finale accettante. Se il calcolo termina in uno stato non accettante, la macchina **rifiuta** la parola. Se il calcolo non termina mai, la parola non viene né accettata né rifiutata.
+
+L'insieme di tutte le parole accettate da una macchina di Turing $M$ è chiamato il **linguaggio** riconosciuto da $M$, indicato con $L(M)$.
+
+## Esempi di macchina di Turing
+
+### Raddoppiare il numero di '1'
+
+La seguente macchina di Turing deterministica a nastro singolo si aspetta una sequenza di uno come input sul nastro. Raddoppia il numero di uno, lasciando un simbolo vuoto nel mezzo. Ad esempio, da "11" diventa la sequenza "11011".
+
+La macchina ha alfabeto {'0', '1'}, con '0' come simbolo vuoto. L'insieme degli stati è {e1, e2, e3, e4, e5} con e1 come stato iniziale. La tabella delle azioni è la seguente:
+
+| Stato | Simbolo letto | Simbolo scritto | Movimento | Nuovo stato |
+|-------|--------------|-----------------|-----------|-------------|
+| e1 | 1 | 0 | R | e2 |
+| e1 | 0 | 0 | N | HALT |
+| e2 | 1 | 1 | R | e2 |
+| e2 | 0 | 0 | R | e3 |
+| e3 | 1 | 1 | R | e3 |
+| e3 | 0 | 1 | L | e4 |
+| e4 | 1 | 1 | L | e4 |
+| e4 | 0 | 0 | L | e5 |
+| e5 | 1 | 1 | L | e5 |
+| e5 | 0 | 1 | R | e1 |
+
+L'esecuzione di questa macchina per una serie di due '1' sarebbe (la posizione della testina di lettura/scrittura sul nastro è evidenziata):
+
+```
+[e1]10...
+0[e2]10...
+01[e2]0...
+010[e3]...
+0101[e4]...
+010[e4]1...
+01[e4]01...
+0[e4]101...
+0[e5]101...
+[e5]0101...
+1[e1]101...
+10[e2]101...
+101[e2]01...
+1010[e3]1...
+10101[e4]...
+1010[e4]1...
+101[e4]01...
+10[e4]101...
+1[e4]0101...
+1[e5]0101...
+[e5]10101...
+1[e1]0101...
+10[e2]101...
+101[e2]01...
+1010[e3]1...
+10101[HALT]...
+```
+
+Il comportamento di questa macchina può essere descritto come un ciclo che:
+1. Inizia nello stato e1, sostituisce il primo 1 con uno 0.
+2. Utilizza lo stato e2 per spostarsi verso destra, saltando gli 1 fino a incontrare uno 0, e passare allo stato e3.
+3. Lo stato e3 è utilizzato per saltare la sequenza successiva di 1 e sostituire il primo 0 incontrato con un 1.
+4. Lo stato e4 permette di tornare verso sinistra fino a trovare uno 0, e passare allo stato e5.
+5. Lo stato e5 permette di spostarsi verso sinistra fino a trovare uno 0, scritto all'inizio dallo stato e1.
+6. La macchina sostituisce questo 0 con un 1, si sposta a destra e passa di nuovo allo stato e1 per una nuova iterazione.
+
+Questo processo si ripete fino a quando e1 incontra uno 0 (lo 0 del centro tra le due sequenze di 1); a questo punto, la macchina si ferma.
+
+### Calcolare un terzo in binario
+
+La seguente macchina di Turing genera infinitamente la sequenza 01010101... che rappresenta l'espansione binaria di 1/3.
+
+| Stato | Simbolo letto | Simbolo scritto | Movimento | Nuovo stato |
+|-------|--------------|-----------------|-----------|-------------|
+| a | 0 o vuoto | 0 | R | b |
+| b | 0 o vuoto | 1 | R | a |
+
+Questa macchina continua indefinitamente a scrivere alternativamente 0 e 1 sul nastro, producendo la rappresentazione binaria di 1/3 = 0.010101...
+
+## Varianti della macchina di Turing
+
+### Macchina di Turing multinastro
+
+La macchina di Turing con più nastri differisce dalla classica sostanzialmente per il tipo della funzione di transizione. Per una macchina a tre nastri, ad esempio, la funzione ha la forma:
+
+$\delta: Q \times \Gamma \times \Gamma \times \Gamma \to Q \times \Gamma \times \{-1, 0, +1\} \times \Gamma \times \{-1, 0, +1\} \times \Gamma \times \{-1, 0, +1\}$
+
+Questa funzione dipende da quanto viene letto sulle caselle in cui si trovano le testine relative ai diversi nastri e stabilisce quali caratteri devono essere modificati sui vari nastri e come si devono eventualmente spostare le testine.
+
+È possibile dimostrare che una macchina a più nastri non ha maggiore potenza computazionale di una macchina a un solo nastro, sebbene possa essere più efficiente.
+
+### Macchina di Turing con memoria bidimensionale
+
+Consente di simulare abbastanza facilmente macchine a più nastri e di effettuare elaborazioni grafiche. Ulteriori varianti possono servirsi di memorie tridimensionali e simili.
+
+### Macchina di Turing non deterministica
+
+Una [macchina di Turing non deterministica](/article/it/Macchina_di_Turing_non_deterministica) (NDTM) si distingue da quella deterministica per il fatto che, in presenza di un determinato stato e di un determinato carattere letto, essa permette più transizioni possibili.
+
+Formalmente, una macchina di Turing non deterministica con grado di non determinismo $n$ ha una funzione di transizione del tipo:
+
+$\delta: Q \times \Gamma \to Q \times (\Gamma \times \{-1, 0, +1\})^k$ dove $k = 1, 2, ..., n$
+
+Le sue configurazioni consistono quindi di insiemi finiti di configurazioni deterministiche, la cui cardinalità potrebbe crescere illimitatamente con il procedere di un'evoluzione.
+
+### Macchina di Turing universale
+
+Una [macchina di Turing universale](/article/it/Macchina_di_Turing_universale) (UTM) è una macchina di Turing che è in grado di simulare qualsiasi altra macchina di Turing. Se si codifica la descrizione di una macchina di Turing come una stringa di caratteri sufficientemente semplice, si può costruire una macchina di Turing universale che prende tale codifica come parte del suo input e simula il comportamento della macchina di Turing codificata sull'input anch'esso dato.
+
+L'esistenza di una macchina di Turing universale è di fondamentale importanza per la teoria della computabilità e ha implicazioni significative, come l'indecidibilità del [problema dell'arresto](/article/it/Problema_dell'arresto).
+
+Come scrisse Turing:
+
+"È possibile inventare una singola macchina che può essere utilizzata per calcolare qualsiasi sequenza calcolabile. Se questa macchina U è fornita con il nastro all'inizio del quale è scritta la stringa di quintuple separate da punto e virgola di una qualche macchina di calcolo M, allora U calcolerà la stessa sequenza di M."
+
+Il modello di calcolo dei moderni computer elettronici è in realtà un tipo di macchina di Turing universale.
+
+### Altre varianti
+
+Altre varianti importanti includono:
+
+- **Macchina di Turing con nastro semi-infinito**: Il nastro è infinito solo in una direzione.
+- **Macchina di Turing alternante**: Estende le regole per l'accettazione di un input, distinguendo tra stati esistenziali e universali.
+- **Macchina di Turing con oracolo**: Generalizzazioni in cui la macchina può eseguire certe operazioni aggiuntive in un passo, come la soluzione di problemi indecidibili.
+- **Macchina di Turing probabilistica**: Permette, per ogni stato e input, due o più possibili transizioni scelte casualmente.
+- **Macchina di Turing quantistica**: Serve come modello per la descrizione teorica delle possibilità dei computer quantistici.
+
+## Proprietà e importanza teorica
+
+### Tesi di Church-Turing
+
+La [tesi di Church-Turing](/article/it/Tesi_di_Church-Turing) afferma che la nozione intuitiva di "calcolabilità" corrisponde esattamente a ciò che può essere calcolato da una macchina di Turing. In altre parole, qualunque funzione che possa essere calcolata da un algoritmo può essere calcolata da una macchina di Turing.
+
+Questa tesi non è dimostrabile formalmente, poiché la nozione di "calcolabilità intuitiva" non è formalmente definita, ma è supportata dall'equivalenza matematica dimostrata tra la macchina di Turing e altri modelli formali di calcolo come il [lambda calcolo](/article/it/Lambda_calcolo), le [funzioni ricorsive](/article/it/Funzioni_ricorsive) e le [macchine a registri](/article/it/Macchine_a_registri).
+
+### Il problema dell'arresto e la sua indecidibilità
+
+Il [problema dell'arresto](/article/it/Problema_dell'arresto) consiste nel determinare, dato un programma e un input, se il programma terminerà o continuerà a eseguire all'infinito. Turing dimostrò che questo problema è indecidibile, cioè non esiste alcun algoritmo generale che possa risolverlo per tutti i possibili programmi e input.
+
+Questo risultato ha profonde implicazioni sulla teoria della computabilità e sui limiti di ciò che può essere calcolato algoritmicamente. Il problema dell'arresto è equivalente al [teorema di incompletezza di Gödel](/article/it/Teorema_di_incompletezza_di_Gödel), e da esso si possono dedurre molti altri risultati limitativi nell'informatica teorica.
+
+### Completezza di Turing
+
+La completezza di Turing è la capacità di un modello computazionale o di un sistema di istruzioni di simulare una macchina di Turing. Un linguaggio di programmazione che è Turing completo è teoricamente capace di esprimere tutti i compiti realizzabili dai computer; quasi tutti i linguaggi di programmazione sono Turing completi se si ignorano le limitazioni della memoria finita.
+
+Un linguaggio o un sistema informatico si dice [Turing-completo](/article/it/Turing-completezza) se può eseguire tutte le operazioni che una macchina di Turing universale può eseguire.
+
+### Relazione con i linguaggi formali
+
+Una macchina di Turing accetta un linguaggio $L$ se, con l'input di ogni parola $x \in L$, si ferma dopo un numero finito di passi in uno stato accettante e, con l'input di ogni parola $x \notin L$, si ferma in uno stato non accettante o non si ferma affatto.
+
+Un linguaggio $L \subseteq \Sigma^{\star}$ è detto [ricorsivamente enumerabile](/article/it/Linguaggio_ricorsivamente_enumerabile) o [semi-decidibile](/article/it/Linguaggio_semi-decidibile) (Tipo 0 della [gerarchia di Chomsky](/article/it/Gerarchia_di_Chomsky)) se e solo se esiste una macchina di Turing che accetta $L$.
+
+Se una macchina di Turing accetta un linguaggio e, inoltre, si ferma per tutti gli input che non appartengono a questo linguaggio, allora la macchina di Turing decide questo linguaggio. Un linguaggio $L \subseteq \Sigma^{\star}$ è detto [ricorsivo](/article/it/Linguaggio_ricorsivo) o [decidibile](/article/it/Linguaggio_decidibile) se e solo se esiste una macchina di Turing che decide $L$.
+
+## Confronto con le macchine reali
+
+Le macchine di Turing differiscono dai computer reali in diversi aspetti importanti:
+
+1. **Memoria infinita**: Una macchina di Turing ha un nastro infinito, mentre i computer reali hanno memoria finita. Tuttavia, la memoria di un computer reale può essere aumentata nel tempo, rendendo questa differenza meno significativa.
+
+2. **Accesso sequenziale**: Una macchina di Turing accede al suo nastro sequenzialmente, mentre i computer moderni utilizzano memoria ad accesso casuale, che è molto più efficiente.
+
+3. **Semplicità delle operazioni**: Le operazioni di una macchina di Turing sono estremamente elementari, mentre i computer reali hanno istruzioni più complesse.
+
+Nonostante queste differenze, le macchine di Turing sono un modello teorico potente perché:
+
+1. Tutto ciò che un computer reale può calcolare, una macchina di Turing può anche calcolarlo.
+
+2. Le macchine di Turing descrivono algoritmi indipendentemente dalla quantità di memoria utilizzata.
+
+3. La tesi di Church-Turing suggerisce che qualsiasi procedura effettivamente calcolabile può essere calcolata da una macchina di Turing.
+
+4. Le macchine di Turing forniscono un modello teorico semplice che facilita lo studio dei limiti fondamentali della computazione.
+
+## Realizzazioni fisiche di macchine di Turing
+
+Sebbene una macchina di Turing sia un oggetto matematico astratto, sono state realizzate diverse implementazioni fisiche a scopo educativo:
+
+- Nell'aprile 2011, Jim MacArthur ha realizzato una macchina di Turing meccanica compatta, a 5 simboli, con delle biglie come supporto di informazioni sul nastro.
+
+- Nel marzo 2012, in occasione dell'anno di Turing, un team di studenti della Scuola Normale Superiore di Lione ha realizzato una macchina di Turing interamente fatta di pezzi Lego senza elettronica.
+
+- Nel novembre 2013, Marc Raynaud ha elaborato un prototipo elettromeccanico della macchina di Turing a 3 simboli, 12 stati e 100 celle sul nastro, che funziona alla frequenza di 1 Hertz.
+
+- Nell'ottobre 2020, Thierry Delattre ha progettato una macchina di Turing pedagogica programmabile per algoritmi aventi al massimo 12 stati e con un alfabeto di 3 simboli, in grado di memorizzare fino a 50 algoritmi.
+
+## Altri modelli di calcolo equivalenti
+
+Oltre alla macchina di Turing, esistono molti altri modelli di calcolo che si sono dimostrati equivalenti in termini di potere computazionale:
+
+- [Macchine a registri](/article/it/Macchine_a_registri)
+- [Funzioni ricorsive](/article/it/Funzioni_ricorsive)
+- [Lambda calcolo](/article/it/Lambda_calcolo)
+- [Algoritmi di Markov](/article/it/Algoritmi_di_Markov)
+- [Gioco della vita](/article/it/Gioco_della_vita)
+
+Questa equivalenza è alla base della tesi di Church-Turing, che afferma che tutte le funzioni intuitivamente calcolabili possono essere calcolate da una macchina di Turing, e viceversa.
+
+## Vedi anche
+
+- [Automa a stati finiti](/article/it/Automa_a_stati_finiti)
+- [Macchina di Turing non deterministica](/article/it/Macchina_di_Turing_non_deterministica)
+- [Macchina di Turing probabilistica](/article/it/Macchina_di_Turing_probabilistica)
+- [Macchina di Turing alternante](/article/it/Macchina_di_Turing_alternante)
+- [Macchina di Turing universale](/article/it/Macchina_di_Turing_universale)
+- [Problema dell'arresto](/article/it/Problema_dell'arresto)
+- [Tesi di Church-Turing](/article/it/Tesi_di_Church-Turing)
+- [Teoria della calcolabilità](/article/it/Teoria_della_calcolabilità)
+- [Teoria della complessità computazionale](/article/it/Teoria_della_complessità_computazionale)
+- [Castoro indaffarato](/article/it/Castoro_indaffarato)
+- [Formica di Langton](/article/it/Formica_di_Langton)
+
+## Bibliografia
+
+- Turing, A., "On Computable Numbers, With an Application to the Entscheidungsproblem", Proceedings of the London Mathematical Society, Series 2, Volume 42, 1936.
+- Hopcroft, J., Ullman, J., "Introduction to Automata Theory, Languages and Computation", Addison-Wesley, 1979.
+- Davis, M., "Il calcolatore universale", Milano, Adelphi, 2003.
+- Sipser, M., "Introduction to the Theory of Computation", PWS Publishing, 1997.
+- Kleene, S.C., "Introduction to Metamathematics", Amsterdam, North-Holland, 1952.
+- Carton, O., "Langages formels, calculabilité et complexité", Paris, Vuibert, 2008.
+- Minsky, M., "Computation: Finite and Infinite Machines", Prentice-Hall, 1967.

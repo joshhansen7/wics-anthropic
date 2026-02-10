@@ -1,0 +1,130 @@
+# Tensor Processing Unit (TPU)
+
+La Tensor Processing Unit (TPU) è un [circuito integrato specifico per applicazioni](/article/it/Application_Specific_Integrated_Circuit) (ASIC) sviluppato da [Google](/article/it/Google) come acceleratore di [intelligenza artificiale](/article/it/Intelligenza_artificiale), progettato specificamente per applicazioni nel campo delle [reti neurali artificiali](/article/it/Rete_neurale_artificiale) e del [deep learning](/article/it/Deep_learning). È stato sviluppato per essere utilizzato principalmente con la libreria open source [TensorFlow](/article/it/TensorFlow) di Google.
+
+Google ha iniziato a utilizzare internamente le TPU nel 2015, per poi presentarle ufficialmente nel maggio del 2016 durante l'evento [Google I/O](/article/it/Google_I/O), specificando che tali dispositivi erano già in uso nei propri [data center](/article/it/Data_center) da oltre un anno. Dal 2018, Google ha reso le TPU disponibili anche a terze parti, sia come parte della propria infrastruttura cloud sia offrendo in vendita versioni più piccole del chip.
+
+## Confronto con CPU e GPU
+
+Rispetto alle tradizionali [unità di elaborazione grafica](/article/it/Graphics_Processing_Unit) (GPU), le TPU sono progettate per eseguire un elevato volume di calcoli a bassa precisione (ad esempio con precisione fino a 8 bit) con più operazioni di input/output per [joule](/article/it/Joule) di energia consumata. A differenza delle GPU, le TPU non dispongono di hardware per rasterizzazione o mappatura delle texture, in quanto non necessario per le operazioni di calcolo delle reti neurali.
+
+Secondo Norman Jouppi, uno degli ingegneri di Google che ha lavorato al progetto, gli ASIC TPU sono montati in un gruppo dissipatore di calore che può essere inserito in uno slot per disco rigido all'interno di un rack di data center, facilitandone l'integrazione nell'infrastruttura esistente.
+
+Diversi tipi di processori sono adatti a diversi tipi di modelli di [apprendimento automatico](/article/it/Machine_learning). Le TPU sono particolarmente efficaci per le [reti neurali convoluzionali](/article/it/Rete_neurale_convoluzionale) (CNN), mentre le GPU presentano vantaggi per alcune reti neurali completamente connesse, e le CPU possono avere vantaggi per le [reti neurali ricorrenti](/article/it/Rete_neurale_ricorrente) (RNN).
+
+Nel 2017, le TPU erano 15-30 volte più veloci e 30-80 volte più efficienti dal punto di vista energetico rispetto alle GPU [Nvidia](/article/it/Nvidia) Tesla K80 e alle CPU [Intel](/article/it/Intel) Xeon E5-2699 v3.
+
+## Storia
+
+Secondo Jonathan Ross, uno degli ingegneri originali della TPU e successivamente fondatore di Groq, tre gruppi separati all'interno di Google stavano sviluppando acceleratori di IA, con la TPU che fu il design infine selezionato. All'epoca, Ross non conosceva il concetto di [array sistolico](/article/it/Array_sistolico) e quando apprese il termine pensò: "Oh, questo si chiama array sistolico? Sembrava semplicemente avere senso."
+
+Il documento pubblicato da Google nel 2017 che descrive la creazione della TPU cita precedenti moltiplicatori di matrici sistolici di architettura simile costruiti negli anni '90. Il chip è stato specificamente progettato per il framework TensorFlow di Google, una libreria matematica simbolica utilizzata per applicazioni di apprendimento automatico come le reti neurali. Tuttavia, fino al 2017, Google ha continuato a utilizzare CPU e GPU per altri tipi di apprendimento automatico.
+
+Le TPU di Google sono proprietarie. Alcuni modelli sono disponibili in commercio e il 12 febbraio 2018, il [The New York Times](/article/it/The_New_York_Times) ha riferito che Google "avrebbe permesso ad altre aziende di acquistare l'accesso a questi chip attraverso il suo servizio di cloud computing."
+
+## Applicazioni
+
+Google ha dichiarato che le TPU sono state utilizzate in diverse applicazioni importanti:
+
+- Nella serie di partite di [Go](/article/it/Go_(gioco)) uomo-contro-macchina tra [AlphaGo](/article/it/AlphaGo) e [Lee Sedol](/article/it/Lee_Sedol), uno dei migliori giocatori di Go al mondo, così come nel sistema [AlphaZero](/article/it/AlphaZero), che ha prodotto programmi per giocare a [Scacchi](/article/it/Scacchi), [Shogi](/article/it/Shogi) e Go partendo solo dalle regole del gioco, battendo i programmi leader in questi giochi.
+- Per l'elaborazione del testo in [Google Street View](/article/it/Google_Street_View), consentendo di trovare tutto il testo nel database di Street View in meno di cinque giorni.
+- In [Google Foto](/article/it/Google_Foto), dove una singola TPU può elaborare oltre 100 milioni di foto al giorno.
+- In [RankBrain](/article/it/RankBrain), il sistema utilizzato da Google per fornire risultati di ricerca.
+
+Google fornisce a terzi l'accesso alle TPU attraverso il suo servizio Cloud TPU come parte della [Google Cloud Platform](/article/it/Google_Cloud_Platform) e attraverso i suoi servizi basati su notebook [Kaggle](/article/it/Kaggle) e [Colaboratory](/article/it/Google_Colaboratory).
+
+## Architettura
+
+Le TPU sono basate su un'architettura a dominio specifico progettata come un processore-matrice pensato esclusivamente per il lavoro con reti neurali a velocità elevate, consumando meno energia e occupando uno spazio fisico ridotto.
+
+Questa architettura riduce significativamente il collo di bottiglia dell'[architettura di von Neumann](/article/it/Architettura_di_von_Neumann), poiché il compito principale del processore è calcolare matrici. Utilizzando un'architettura ad array sistolico, può impiegare migliaia di moltiplicatori e addizionatori connessi direttamente per formare una matrice fisica per questi operatori.
+
+## Generazioni di TPU
+
+### TPU di prima generazione
+
+La TPU di prima generazione è un motore di moltiplicazione di matrici a 8 bit, guidato con istruzioni [CISC](/article/it/CISC) dal processore host attraverso un bus [PCIe](/article/it/PCI_Express) 3.0. È prodotta con un processo a 28 nm con una dimensione del die inferiore a 331 mm². La frequenza di clock è di 700 MHz e ha un thermal design power (TDP) di 28-40 W.
+
+Dispone di 28 MiB di memoria on-chip e 4 MiB di accumulatori a 32 bit che ricevono i risultati di un array sistolico 256×256 di moltiplicatori a 8 bit. All'interno del package TPU ci sono 8 GiB di SDRAM [DDR3](/article/it/DDR3_SDRAM) dual-channel a 2133 MHz che offrono 34 GB/s di larghezza di banda.
+
+Le istruzioni trasferiscono dati da o verso l'host, eseguono moltiplicazioni di matrici o convoluzioni e applicano funzioni di attivazione.
+
+### TPU di seconda generazione
+
+La TPU di seconda generazione è stata annunciata a maggio 2017. Google ha dichiarato che il design della TPU di prima generazione era limitato dalla larghezza di banda della memoria e che l'utilizzo di 16 GB di [High Bandwidth Memory](/article/it/High_Bandwidth_Memory) (HBM) nel design di seconda generazione ha aumentato la larghezza di banda a 600 GB/s e le prestazioni a 45 teraFLOPS.
+
+Le TPU sono poi disposte in moduli a quattro chip con prestazioni di 180 teraFLOPS. Quindi 64 di questi moduli sono assemblati in pod da 256 chip con prestazioni di 11,5 petaFLOPS.
+
+È importante notare che, mentre le TPU di prima generazione erano limitate agli interi, le TPU di seconda generazione possono anche calcolare in virgola mobile, introducendo il formato bfloat16 inventato da [Google Brain](/article/it/Google_Brain). Questo rende le TPU di seconda generazione utili sia per l'addestramento che per l'inferenza di modelli di apprendimento automatico.
+
+Le TPU di seconda generazione dispongono di due "unità di esecuzione matriciale" (Matrix Execution Unit; MXU) con 8 GiB di memoria ciascuna. Ogni MXU ha una potenza di calcolo di 22,5 TFLOPS. Le TPU sono interconnesse in una topologia di rete a forma sferica (toro 2D) di 8×8 TPU ciascuna. Per collegare le CPU alle TPU viene utilizzato PCI-Express 3.0 con 32 lane (8 lane per TPU).
+
+### TPU di terza generazione
+
+La TPU di terza generazione è stata annunciata l'8 maggio 2018. Google ha comunicato che i processori stessi sono due volte più potenti delle TPU di seconda generazione e sarebbero stati distribuiti in pod con quattro volte più chip rispetto alla generazione precedente.
+
+Ciò si traduce in un aumento delle prestazioni di 8 volte per pod (con fino a 1.024 chip per pod) rispetto alla distribuzione TPU di seconda generazione. Questi pod utilizzano un sistema di raffreddamento a liquido per gestire il calore generato.
+
+Le TPU di terza generazione hanno 4 MXU con 8 GiB di memoria ciascuna (32 GiB per TPU). La topologia di rete delle TPU è anch'essa progettata come un toro 2D. I Pod TPU 3.0 sono composti da 8 rack con un totale di 1024 TPU e 256 CPU server, con una potenza di calcolo di poco superiore a 100 PFLOPS.
+
+### TPU di quarta generazione
+
+La TPU di quarta generazione (TPU v4) è stata presentata da Sundar Pichai, CEO di Google, durante il suo keynote alla conferenza virtuale Google I/O il 18 maggio 2021. TPU v4 ha migliorato le prestazioni di oltre 2 volte rispetto ai chip TPU v3.
+
+Pichai ha dichiarato: "Un singolo pod v4 contiene 4.096 chip v4, e ogni pod ha una larghezza di banda di interconnessione 10 volte superiore per chip su scala, rispetto a qualsiasi altra tecnologia di rete." Un documento di Google dell'aprile 2023 afferma che TPU v4 è dal 5% all'87% più veloce di una Nvidia A100 nei benchmark di apprendimento automatico.
+
+È stata sviluppata anche una versione per l'inferenza, chiamata v4i, che non richiede raffreddamento a liquido.
+
+Con i cosiddetti SparseCores e Optical Circuit Switches (OCS), la TPU v4 può riconfigurare e scalare dinamicamente le connessioni interne. La rete ottica può inoltre essere adattata alla struttura del modello di IA calcolato. La sicurezza è stata aumentata separando i rack a livello di rete. L'OCS è relativamente economico, rappresentando meno del cinque per cento del costo totale della TPU, e dal punto di vista del consumo energetico, la rete ottica incide per meno del tre per cento.
+
+Grazie a un passaggio a un processo produttivo a 7 nm e a un numero di transistor di 22 miliardi, la TPU v4 ha una potenza di calcolo di 275 TFLOPS in bfloat16 e int8, più che doppia rispetto alla generazione precedente. Con una dimensione di soli 600 mm², è più piccola e consuma un massimo di 192 watt, con un risparmio rispetto alla TPU v3.
+
+### TPU di quinta generazione
+
+Nel 2021, Google ha rivelato che il layout fisico di TPU v5 è stato progettato con l'assistenza di una nuova applicazione di [apprendimento per rinforzo](/article/it/Apprendimento_per_rinforzo) profondo. Google afferma che TPU v5 è quasi due volte più veloce di TPU v4.
+
+Simile alla v4i, che è una versione più leggera della v4, la quinta generazione ha una versione "economicamente efficiente" chiamata v5e. Nel dicembre 2023, Google ha annunciato TPU v5p, affermando che è competitiva con l'[Nvidia H100](/article/it/Nvidia_H100).
+
+### TPU di sesta generazione
+
+A maggio 2024, alla conferenza Google I/O, Google ha annunciato TPU v6e (nome in codice "Trillium"), che è diventata disponibile in anteprima nell'ottobre 2024. Google ha dichiarato un aumento delle prestazioni di 4,7 volte rispetto a TPU v5e, tramite unità di moltiplicazione di matrici più grandi e una maggiore frequenza di clock. La capacità e la larghezza di banda della memoria ad alta larghezza di banda (HBM) sono anche raddoppiate. Un pod può contenere fino a 256 unità Trillium.
+
+### TPU di settima generazione
+
+Nell'aprile 2025, alla conferenza Google Cloud Next, Google ha presentato TPU v7 (nome in codice "Ironwood"). Questo nuovo chip è disponibile in due configurazioni: un cluster da 256 chip e un cluster da 9.216 chip. Ironwood ha un tasso di prestazioni computazionali di picco di 4.614 TFLOP/s.
+
+### Edge TPU
+
+Nel luglio 2018, Google ha annunciato l'Edge TPU, un chip ASIC progettato specificamente per eseguire modelli di apprendimento automatico per l'[edge computing](/article/it/Edge_computing), il che significa che è molto più piccolo e consuma molta meno energia rispetto alle TPU ospitate nei data center di Google (note anche come Cloud TPU).
+
+Nel gennaio 2019, Google ha reso l'Edge TPU disponibile agli sviluppatori con una linea di prodotti con il marchio Coral. L'Edge TPU è in grado di eseguire 4 trilioni di operazioni al secondo con soli 2 W di potenza elettrica.
+
+Le offerte di prodotti includono un computer a scheda singola (SBC), un sistema su modulo (SoM), un accessorio USB, una scheda mini PCI-e e una scheda M.2. Il Coral Dev Board SBC e il Coral SoM eseguono entrambi Mendel Linux OS - una derivata di [Debian](/article/it/Debian). I prodotti USB, PCI-e e M.2 funzionano come componenti aggiuntivi per sistemi informatici esistenti e supportano sistemi Linux basati su Debian su host x86-64 e ARM64 (incluso [Raspberry Pi](/article/it/Raspberry_Pi)).
+
+Il runtime di apprendimento automatico utilizzato per eseguire modelli sull'Edge TPU è basato su TensorFlow Lite. L'Edge TPU è in grado di accelerare solo le operazioni di forward-pass, il che significa che è principalmente utile per eseguire inferenze (sebbene sia possibile eseguire un transfer learning leggero sull'Edge TPU). L'Edge TPU supporta inoltre solo l'aritmetica a 8 bit.
+
+Il 12 novembre 2019, [Asus](/article/it/Asus) ha annunciato una coppia di computer a scheda singola (SBC) con l'Edge TPU: l'Asus Tinker Edge T e Tinker Edge R Board, progettati per [IoT](/article/it/Internet_of_Things) e AI edge. Gli SBC supportano ufficialmente i sistemi operativi [Android](/article/it/Android) e Debian.
+
+### Pixel Neural Core e Google Tensor
+
+Il 15 ottobre 2019, Google ha annunciato lo smartphone [Pixel 4](/article/it/Google_Pixel_4), che contiene un Edge TPU chiamato Pixel Neural Core. Google lo descrive come "personalizzato per soddisfare i requisiti delle funzionalità chiave della fotocamera nel Pixel 4", utilizzando una ricerca di rete neurale che sacrifica parte della precisione a favore della minimizzazione della latenza e dell'utilizzo di energia.
+
+Google ha seguito il Pixel Neural Core integrando un Edge TPU in un system-on-chip personalizzato chiamato Google Tensor, rilasciato nel 2021 con la linea di smartphone [Pixel 6](/article/it/Google_Pixel_6). Il SoC Google Tensor ha dimostrato "vantaggi di prestazioni estremamente grandi rispetto alla concorrenza" nei benchmark incentrati sull'apprendimento automatico; sebbene anche il consumo di energia istantaneo fosse relativamente alto, le migliori prestazioni significavano che veniva consumata meno energia a causa di periodi più brevi che richiedono prestazioni di picco.
+
+## Causa legale
+
+Nel 2019, Singular Computing, fondata nel 2009 da Joseph Bates, professore visitatore al [MIT](/article/it/Massachusetts_Institute_of_Technology), ha intentato una causa contro Google per presunta violazione di brevetto nei chip TPU. Entro il 2020, Google era riuscita a ridurre il numero di rivendicazioni che il tribunale avrebbe considerato a sole due: la rivendicazione 53 del brevetto US 8407273 depositato nel 2012 e la rivendicazione 7 del brevetto US 9218156 depositato nel 2013, entrambe le quali rivendicano un intervallo dinamico da 10^-6 a 10^6 per i numeri in virgola mobile.
+
+In un documento del tribunale del 2023, Singular Computing ha specificamente evidenziato l'uso da parte di Google di bfloat16, poiché supera l'intervallo dinamico di float16. Singular sostiene che i formati a virgola mobile non standard non erano ovvi nel 2009, ma Google ribatte che il formato VFLOAT, con un numero configurabile di bit di esponente, esisteva come arte nota nel 2002.
+
+Entro gennaio 2024, successive cause di Singular avevano portato il numero di brevetti in contenzioso a otto. Verso la fine del processo più tardi nello stesso mese, Google ha accettato un accordo con termini non divulgati.
+
+## Vedi anche
+
+- [Computer cognitivo](/article/it/Computer_cognitivo)
+- [Acceleratore AI](/article/it/Acceleratore_AI)
+- [Tensore strutturale](/article/it/Tensore_strutturale), una base matematica per la TPU
+- [Tensor Core](/article/it/Tensor_Core), un'architettura simile di Nvidia
+- [TrueNorth](/article/it/TrueNorth), un dispositivo simile che simula neuroni spiking invece di tensori a bassa precisione
+- [Unità di elaborazione visiva](/article/it/Unità_di_elaborazione_visiva), un dispositivo simile specializzato per l'elaborazione visiva
+- [Google Tensor](/article/it/Google_Tensor), SoC di Google con TPU integrata

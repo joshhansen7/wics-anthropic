@@ -1,0 +1,518 @@
+# Markov Chain
+
+A **Markov chain** is a stochastic process describing a sequence of possible events in which the probability of each event depends only on the state attained in the previous event. Informally, this may be thought of as, "What happens next depends only on the state of affairs now." Markov chains are named after the Russian mathematician [Andrey Markov](/article/en/Andrey_Markov), who first introduced this concept in his 1906 paper.
+
+Markov chains have many applications as statistical models of real-world processes. They provide the basis for general stochastic simulation methods known as [Markov chain Monte Carlo](/article/en/Markov_chain_Monte_Carlo), which are used for simulating sampling from complex probability distributions, and have found application in areas including [Bayesian statistics](/article/en/Bayesian_statistics), biology, chemistry, economics, finance, [information theory](/article/en/Information_theory), physics, signal processing, and speech processing.
+
+The adjectives **Markovian** and **Markov** are used to describe something that is related to a Markov process.
+
+## Principles
+
+### Definition
+
+A Markov process is a stochastic process that satisfies the **Markov property** (sometimes characterized as "memorylessness"). In simpler terms, it is a process for which predictions can be made regarding future outcomes based solely on its present state and—most importantly—such predictions are just as good as the ones that could be made knowing the process's full history. In other words, conditional on the present state of the system, its future and past states are independent.
+
+Formally, a sequence of discrete random variables ${X_n}_{n\geq 0}$ is called a simple Markov chain (first-order Markov chain) if:
+
+$$\mathbb{P}(X_{n+1}=i_{n+1}|X_{n}=i_{n},X_{n-1}=i_{n-1},\ldots,X_{0}=i_{0})=\mathbb{P}(X_{n+1}=i_{n+1}|X_{n}=i_{n})$$
+
+For continuous-time Markov chains, a family of discrete random variables ${X_t}_{t\geq 0}$ is called a Markov chain if:
+
+$$\mathbb{P}(X_{t+h}=x_{t+h}|X_{s}=x_{s},\;0<s\leq t)=\mathbb{P}(X_{t+h}=x_{t+h}|X_{t}=x_{t})$$
+
+A Markov chain is a type of Markov process that has either a discrete state space or a discrete index set (often representing time). The state space of a Markov chain can be finite, countably infinite, or even uncountable, though many applications use finite or countably infinite state spaces.
+
+### Types of Markov Chains
+
+The system's state space and time parameter index need to be specified. Different types of Markov processes exist based on the nature of state space and time:
+
+1. **Discrete-time Markov chain (DTMC)**: A process with discrete time steps and a discrete state space.
+2. **Continuous-time Markov chain (CTMC)**: A process with continuous time and a discrete state space.
+3. **Markov process with general state space**: Processes that can have continuous state spaces.
+
+Note that there is no definitive agreement in the literature on the use of some terms. Usually, the term "Markov chain" is reserved for a process with a discrete set of times (DTMC), but some authors use the term "Markov process" to refer to a continuous-time Markov chain without explicit mention.
+
+#### Higher-Order Markov Chains
+
+A sequence of discrete random variables ${X_n}_{n\geq 0}$ is called an $N$-th order Markov chain if:
+
+$$\mathbb{P}(X_{n+1}=i_{n+1}|X_{n}=i_{n},X_{n-1}=i_{n-1},\ldots,X_{0}=i_{0})=\mathbb{P}(X_{n+1}=i_{n+1}|X_{n}=i_{n},X_{n-1}=i_{n-1},\ldots,X_{n-N+1}=i_{n-N+1})$$
+
+Thus, the future state of an $N$-th order Markov chain depends on the current state and the $N-1$ previous states. First-order Markov chains are the simplest case, where the future state depends only on the current state.
+
+An $N$-th order Markov chain can be represented as a simple first-order Markov chain by using $N$-tuples of states as the new state space.
+
+### Transitions
+
+The changes of state of the system are called **transitions**. The probabilities associated with various state changes are called **transition probabilities**. The process is characterized by a state space, a transition matrix describing the probabilities of particular transitions, and an initial state (or initial distribution) across the state space.
+
+For a time-homogeneous Markov chain, the transition matrix $P$ has elements:
+
+$$p_{ij} = \mathbb{P}(X_{n+1}=j|X_{n}=i)$$
+
+This represents the probability of moving from state $i$ to state $j$ in one step. The matrix $P$ is a right stochastic matrix, meaning that each row sums to 1.
+
+The $n$-step transition probability, denoted as $p_{ij}^{(n)}$, represents the probability of moving from state $i$ to state $j$ in exactly $n$ steps. For a time-homogeneous Markov chain, these can be computed by taking the $n$-th power of the transition matrix:
+
+$$p_{ij}^{(n)} = [P^n]_{ij}$$
+
+The $n$-step transition probabilities satisfy the **Chapman-Kolmogorov equation**, which for any $k$ such that $0 < k < n$:
+
+$$p_{ij}^{(n)} = \sum_{r \in S} p_{ir}^{(k)}p_{rj}^{(n-k)}$$
+
+where $S$ is the state space of the Markov chain.
+
+## History
+
+[Andrey Markov](/article/en/Andrey_Markov) studied Markov processes in the early 20th century, publishing his first paper on the topic in 1906. Markov processes in continuous time were discovered earlier in the form of the [Poisson process](/article/en/Poisson_process). Markov was interested in studying an extension of independent random sequences, motivated by a disagreement with Pavel Nekrasov, who claimed independence was necessary for the [weak law of large numbers](/article/en/Law_of_large_numbers) to hold.
+
+In his first paper on Markov chains, published in 1906, Markov showed that under certain conditions the average outcomes of the Markov chain would converge to a fixed vector of values, thus proving a weak law of large numbers without the independence assumption, which had been commonly regarded as a requirement for such mathematical laws to hold. Markov later used Markov chains to study the distribution of vowels in *Eugene Onegin*, written by [Alexander Pushkin](/article/en/Alexander_Pushkin), and proved a [central limit theorem](/article/en/Central_limit_theorem) for such chains.
+
+In 1912, [Henri Poincaré](/article/en/Henri_Poincaré) studied Markov chains on finite groups with an aim to study card shuffling. Other early uses of Markov chains include a diffusion model, introduced by [Paul](/article/en/Paul_Ehrenfest) and [Tatyana Ehrenfest](/article/en/Tatyana_Ehrenfest) in 1907, and a branching process, introduced by [Francis Galton](/article/en/Francis_Galton) and Henry William Watson in 1873, preceding the work of Markov. After the work of Galton and Watson, it was later revealed that their branching process had been independently discovered and studied around three decades earlier by Irénée-Jules Bienaymé.
+
+Starting in 1928, [Maurice Fréchet](/article/en/Maurice_Fréchet) became interested in Markov chains, eventually publishing a detailed study on Markov chains in 1938.
+
+[Andrey Kolmogorov](/article/en/Andrey_Kolmogorov) developed in a 1931 paper a large part of the early theory of continuous-time Markov processes. Kolmogorov was partly inspired by [Louis Bachelier's](/article/en/Louis_Bachelier) 1900 work on fluctuations in the stock market as well as [Norbert Wiener's](/article/en/Norbert_Wiener) work on Einstein's model of [Brownian movement](/article/en/Brownian_movement). He introduced and studied a particular set of Markov processes known as [diffusion processes](/article/en/Diffusion_process), where he derived a set of differential equations describing the processes.
+
+Independent of Kolmogorov's work, [Sydney Chapman](/article/en/Sydney_Chapman_(mathematician)) derived in a 1928 paper an equation, now called the [Chapman–Kolmogorov equation](/article/en/Chapman-Kolmogorov_equation), in a less mathematically rigorous way than Kolmogorov, while studying Brownian movement. The differential equations are now called the Kolmogorov equations or the Kolmogorov–Chapman equations.
+
+Other mathematicians who contributed significantly to the foundations of Markov processes include [William Feller](/article/en/William_Feller), starting in the 1930s, and then later [Eugene Dynkin](/article/en/Eugene_Dynkin), starting in the 1950s.
+
+The generalization to countably infinite state spaces was given by Kolmogorov in 1936. Markov chains are connected to two important physics topics of the early 20th century: Brownian motion and the ergodic hypothesis, but Markov's search seems to have been motivated not just mathematically but nominally by an extension of the law of large numbers for dependent events.
+
+## Examples
+
+### Mark V. Shaney
+
+[Mark V. Shaney](/article/en/Mark_V._Shaney) is a third-order Markov chain program, and a Markov text generator. It ingests the sample text (the Tao Te Ching, or the posts of a Usenet group) and creates a massive list of every sequence of three successive words (triplet) which occurs in the text. It then chooses two words at random, and looks for a word which follows those two in one of the triplets in its massive list. If there is more than one, it picks at random (identical triplets count separately, so a sequence which occurs twice is twice as likely to be picked as one which only occurs once). It then adds that word to the generated text. Then, in the same way, it picks a triplet that starts with the second and third words in the generated text, and that gives a fourth word. It adds the fourth word, then repeats with the third and fourth words, and so on.
+
+### Random Walks
+
+[Random walks](/article/en/Random_walk) based on integers and the [gambler's ruin problem](/article/en/Gambler's_ruin) are examples of Markov processes. Some variations of these processes were studied hundreds of years earlier in the context of independent variables.
+
+Two important examples of Markov processes are the [Wiener process](/article/en/Wiener_process), also known as the Brownian motion process, and the [Poisson process](/article/en/Poisson_process), which are considered the most important and central stochastic processes in the theory of stochastic processes. These two processes are Markov processes in continuous time, while random walks on the integers and the gambler's ruin problem are examples of Markov processes in discrete time.
+
+A famous Markov chain is the so-called "drunkard's walk", a random walk on the number line where, at each step, the position may change by +1 or −1 with equal probability. From any position there are two possible transitions, to the next or previous integer. The transition probabilities depend only on the current position, not on the manner in which the position was reached. For example, the transition probabilities from 5 to 4 and 5 to 6 are both 0.5, and all other transition probabilities from 5 are 0. These probabilities are independent of whether the system was previously in 4 or 6.
+
+### Weather Forecasting Example
+
+A simple example of a Markov chain is a basic weather forecasting model. Let's consider three states: 1 = "the sun is shining", 2 = "it is cloudy", and 3 = "it is raining", with one day as the time step. If the sun is shining today, we might estimate from historical data that the probability that it will rain tomorrow is approximately 80% and the probability that it will be cloudy is about 20%. We assume these probabilities don't change over time (homogeneous Markov chain).
+
+If we represent the transition probabilities as a matrix:
+
+$$P = 
+\begin{bmatrix} 
+0 & 0.2 & 0.8 \\
+0.5 & 0 & 0.5 \\
+0.1 & 0.9 & 0 
+\end{bmatrix}$$
+
+Where, for example, the first row indicates that if it's sunny today (state 1), there's a 0% chance it will be sunny tomorrow, a 20% chance it will be cloudy, and an 80% chance it will rain.
+
+Starting from a known state (e.g., sunny today), we can calculate the probabilities for future days by multiplying the initial state vector by powers of the transition matrix.
+
+### A Non-Markov Example
+
+Suppose that there is a coin purse containing five coins worth 25¢, five coins worth 10¢ and five coins worth 5¢, and one by one, coins are randomly drawn from the purse and are set on a table. If $X_n$ represents the total value of the coins set on the table after $n$ draws, with $X_0 = 0$, then the sequence $\{X_n : n \in \mathbb{N}\}$ is not a Markov process.
+
+To see why this is the case, suppose that in the first six draws, all five nickels and a quarter are drawn. Thus $X_6 = \$0.50$. If we know not just $X_6$, but the earlier values as well, then we can determine which coins have been drawn, and we know that the next coin will not be a nickel; so we can determine that $X_7 \geq \$0.60$ with probability 1. But if we do not know the earlier values, then based only on the value $X_6$ we might guess that we had drawn four dimes and two nickels, in which case it would certainly be possible to draw another nickel next. Thus, our guesses about $X_7$ are impacted by our knowledge of values prior to $X_6$.
+
+However, it is possible to model this scenario as a Markov process by defining the state to represent the count of each type of coin on the table rather than just their total value. This new model would have 216 possible states (6×6×6), where each state represents the number of coins of each type (from 0 to 5) that are on the table.
+
+## Properties of Markov Chains
+
+### Irreducibility
+
+A Markov chain is **irreducible** if it is possible to get from any state to any other state in a finite number of steps with positive probability. Formally, state $j$ is said to be accessible from state $i$ if there exists some $n \geq 0$ such that $p_{ij}^{(n)} > 0$. If states $i$ and $j$ are mutually accessible, then states $i$ and $j$ are said to communicate. If any pair of states in the state space communicate with each other, then the Markov chain is irreducible.
+
+Irreducibility is important for convergence to a stationary state. In an irreducible Markov chain, any state can be reached from any other state.
+
+### Periodicity
+
+The **period** of a state $i$ is defined as:
+
+$$k = \gcd\{n > 0 : \mathbb{P}(X_n = i | X_0 = i) > 0\}$$
+
+where $\gcd$ refers to the greatest common divisor. If $k = 1$, the state is said to be **aperiodic**. Otherwise, if $k > 1$, the state is **periodic** with period $k$.
+
+All states in a communicating class must have the same period. An irreducible Markov chain is said to be **ergodic** if all its states are aperiodic.
+
+Periodic Markov chains retain certain deterministic structures despite the randomness of the system. If a Markov chain is periodic with period $d$, it can at most return to its starting point every $d$ time steps (but this is not mandatory).
+
+### Recurrence and Transience
+
+A state $i$ is said to be **transient** if, starting from $i$, there is a non-zero probability that the chain will never return to $i$. Formally, defining the random variable $T_i$ as the time to next return to state $i$ (arrival time):
+
+$$T_i = \min\{n > 0 : X_n = i | X_0 = i\}$$
+
+If the probability that $T_i$ is not finite is non-zero, then state $i$ is transient:
+
+$$\mathbb{P}(T_i < \infty) < 1$$
+
+A state $i$ is said to be **recurrent** (or **persistent**) if it is not transient. That is, starting from state $i$, the probability of eventually returning to $i$ is 1.
+
+For a recurrent state $i$, the mean hitting time (expected return time) is defined as:
+
+$$M_i = E[T_i] = \sum_{n=1}^{\infty} n \cdot f_{ii}^{(n)}$$
+
+where $f_{ii}^{(n)} = \mathbb{P}(\min\{m > 0 : X_m = i\} = n | X_0 = i)$.
+
+State $i$ is **positive recurrent** if $M_i$ is finite and **null recurrent** otherwise. Periodicity, transience, recurrence, and positive and null recurrence are class properties—that is, if one state has the property then all states in its communicating class have the property.
+
+### Absorbing States
+
+A state $i$ is called **absorbing** if there are no outgoing transitions from the state, i.e., $p_{ii} = 1$ and $p_{ij} = 0$ for all $j \neq i$. Once the chain enters an absorbing state, it stays there forever.
+
+### Stationary Distributions
+
+A **stationary distribution** (or **invariant measure**) of a Markov chain is a probability distribution that remains unchanged in the Markov chain after one transition. It is a row vector $\pi$ whose elements are non-negative, sum to 1, and satisfy:
+
+$$\pi = \pi P$$
+
+or equivalently
+
+$$\forall j \in S, \quad \pi_j = \sum_{i \in S} \pi_i p_{ij}$$
+
+If the Markov chain is irreducible and positive recurrent, then there exists a unique stationary distribution $\pi$. The stationary distribution has the following relationship with the expected recurrence time $M_j$:
+
+$$\pi_j = \frac{1}{M_j}$$
+
+Furthermore, if the chain is irreducible and aperiodic, then for any initial distribution, the distribution of the chain converges to the stationary distribution:
+
+$$\lim_{n \to \infty} p_{ij}^{(n)} = \pi_j$$
+
+This means that over time, the Markov chain "forgets" its initial state and converges to the stationary distribution.
+
+The term "stationary" is justified by the fact that if the initial distribution of the Markov chain is the stationary distribution, then the distribution of the chain remains the same at all future times.
+
+### Reversibility
+
+A Markov chain is said to be **reversible** if there exists a probability distribution $\pi$ such that:
+
+$$\pi_i p_{ij} = \pi_j p_{ji}$$
+
+This is also known as the detailed balance condition. In a reversible Markov chain, the process looks the same whether run forward or backward in time, when started with the distribution $\pi$.
+
+If a Markov chain is reversible with respect to $\pi$, then $\pi$ is always a stationary distribution of the chain.
+
+## Formal Definition
+
+### Discrete-time Markov Chain
+
+A discrete-time Markov chain is a sequence of random variables $X_1, X_2, X_3, \ldots$ with the Markov property, namely that the probability of moving to the next state depends only on the present state and not on the previous states:
+
+$$\Pr(X_{n+1} = x | X_1 = x_1, X_2 = x_2, \ldots, X_n = x_n) = \Pr(X_{n+1} = x | X_n = x_n)$$
+
+if both conditional probabilities are well defined, that is, if $\Pr(X_1 = x_1, \ldots, X_n = x_n) > 0$.
+
+The possible values of $X_i$ form a countable set $S$ called the state space of the chain.
+
+### Continuous-time Markov Chain
+
+A continuous-time Markov chain $(X_t)_{t \geq 0}$ is defined by a finite or countable state space $S$, a transition rate matrix $Q$ with dimensions equal to that of the state space, and an initial probability distribution defined on the state space. For $i \neq j$, the elements $q_{ij}$ are non-negative and describe the rate of the process transitions from state $i$ to state $j$. The elements $q_{ii}$ are chosen such that each row of the transition rate matrix sums to zero.
+
+There are three equivalent definitions of the process:
+
+1. **Infinitesimal definition**: Let $X_t$ be the random variable describing the state of the process at time $t$, and assume the process is in a state $i$ at time $t$. Then, knowing $X_t = i$, $X_{t+h} = j$ is independent of previous values $(X_s : s < t)$, and as $h \to 0$ for all $j$ and for all $t$:
+
+   $$\Pr(X(t+h) = j | X(t) = i) = \delta_{ij} + q_{ij}h + o(h)$$
+
+   where $\delta_{ij}$ is the Kronecker delta and $o(h)$ represents terms that approach 0 faster than $h$ as $h$ approaches 0.
+
+2. **Jump chain/holding time definition**: Define a discrete-time Markov chain $Y_n$ to describe the $n$th jump of the process and variables $S_1, S_2, S_3, \ldots$ to describe holding times in each of the states where $S_i$ follows the exponential distribution with rate parameter $-q_{Y_i Y_i}$.
+
+3. **Transition probability definition**: For any value $n = 0, 1, 2, 3, \ldots$ and times indexed up to this value of $n$: $t_0, t_1, t_2, \ldots$ and all states recorded at these times $i_0, i_1, i_2, i_3, \ldots$ it holds that:
+
+   $$\Pr(X_{t_{n+1}} = i_{n+1} | X_{t_0} = i_0, X_{t_1} = i_1, \ldots, X_{t_n} = i_n) = p_{i_n i_{n+1}}(t_{n+1} - t_n)$$
+
+   where $p_{ij}$ is the solution of the forward equation (a first-order differential equation):
+
+   $$P'(t) = P(t)Q$$
+
+   with initial condition $P(0)$ is the identity matrix.
+
+## Variations
+
+### Time-homogeneous Markov Chains
+
+Time-homogeneous Markov chains are processes where:
+
+$$\Pr(X_{n+1} = x | X_n = y) = \Pr(X_n = x | X_{n-1} = y)$$
+
+for all $n$. The transition probability is independent of $n$.
+
+### Stationary Markov Chains
+
+Stationary Markov chains are processes where:
+
+$$\Pr(X_0 = x_0, X_1 = x_1, \ldots, X_k = x_k) = \Pr(X_n = x_0, X_{n+1} = x_1, \ldots, X_{n+k} = x_k)$$
+
+for all $n$ and $k$. Every stationary chain can be proved to be time-homogeneous by Bayes' rule. A necessary and sufficient condition for a time-homogeneous Markov chain to be stationary is that the distribution of $X_0$ is a stationary distribution of the Markov chain.
+
+### Markov Chains with Memory
+
+A Markov chain with memory (or a Markov chain of order $m$) where $m$ is finite, is a process satisfying:
+
+$$\Pr(X_n = x_n | X_{n-1} = x_{n-1}, X_{n-2} = x_{n-2}, \ldots, X_1 = x_1) = \Pr(X_n = x_n | X_{n-1} = x_{n-1}, X_{n-2} = x_{n-2}, \ldots, X_{n-m} = x_{n-m}) \text{ for } n > m$$
+
+In other words, the future state depends on the past $m$ states. It is possible to construct a chain $(Y_n)$ from $(X_n)$ which has the 'classical' Markov property by taking as state space the ordered $m$-tuples of $X$ values, i.e., $Y_n = (X_n, X_{n-1}, \ldots, X_{n-m+1})$.
+
+### Continuous-time Processes
+
+Markov processes in continuous time are an important extension of Markov chains. In a continuous-time Markov process, transitions can occur at any real time, not just at integer time steps.
+
+A general state space Markov chain is a process with a state space that can be continuous rather than discrete. This allows modeling of more complex systems, such as physical processes with continuous variables.
+
+## Finite State Space
+
+If the state space is finite, the transition probability distribution can be represented by a matrix, called the transition matrix, with the $(i, j)$th element of $P$ equal to:
+
+$$p_{ij} = \Pr(X_{n+1} = j | X_n = i)$$
+
+Since each row of $P$ sums to one and all elements are non-negative, $P$ is a right stochastic matrix.
+
+### Stationary Distribution Relation to Eigenvectors and Simplices
+
+A stationary distribution $\pi$ is a (row) vector, whose entries are non-negative and sum to 1, is unchanged by the operation of transition matrix $P$ on it and so is defined by:
+
+$$\pi P = \pi$$
+
+By comparing this definition with that of an eigenvector we see that the two concepts are related and that:
+
+$$\pi = \frac{e}{\sum_i e_i}$$
+
+is a normalized ($\sum_i \pi_i = 1$) multiple of a left eigenvector $e$ of the transition matrix $P$ with an eigenvalue of 1. If there is more than one unit eigenvector then a weighted sum of the corresponding stationary states is also a stationary state. But for a Markov chain one is usually more interested in a stationary state that is the limit of the sequence of distributions for some initial distribution.
+
+### Time-homogeneous Markov Chain with a Finite State Space
+
+If the Markov chain is time-homogeneous, then the transition matrix $P$ is the same after each step, so the $k$-step transition probability can be computed as the $k$-th power of the transition matrix, $P^k$.
+
+If the Markov chain is irreducible and aperiodic, then there is a unique stationary distribution $\pi$. Additionally, in this case $P^k$ converges to a rank-one matrix in which each row is the stationary distribution $\pi$:
+
+$$\lim_{k \to \infty} P^k = 1\pi$$
+
+where $1$ is the column vector with all entries equal to 1. This is stated by the Perron–Frobenius theorem. If, by whatever means, $\lim_{k \to \infty} P^k$ is found, then the stationary distribution of the Markov chain in question can be easily determined for any starting distribution.
+
+### Convergence Speed to the Stationary Distribution
+
+The speed of convergence to the stationary distribution can be analyzed using the eigenvalues of the transition matrix. If $P$ has eigenvalues $\lambda_i$ ordered such that:
+
+$$1 = |\lambda_1| > |\lambda_2| \geq |\lambda_3| \geq \cdots \geq |\lambda_n|$$
+
+then the rate of convergence is determined by the second largest eigenvalue $\lambda_2$. The smaller the ratio $|\lambda_2/\lambda_1| = |\lambda_2|$, the faster the convergence to the stationary distribution.
+
+## Continuous-time Markov Process with General State Space
+
+The definition of Markov processes in continuous time with general state space is more technical than the discrete-time case.
+
+A continuous-time Markov process $X = (X_t)_{t \geq 0}$ is a stochastic process adapted to a filtration $\mathbb{F} = (\mathcal{F}_t)_{t \geq 0}$ with values in a locally compact Polish space $(S, \mathcal{B}(S))$. Then $X$ is called a Markov process with distributions $(P_x)_{x \in S}$ on $(\Omega, \mathcal{A})$ if:
+
+1. For all $x \in S$, $X$ is a stochastic process on $(\Omega, \mathcal{A}, P_x)$ with $P_x(X_0 = x) = 1$.
+2. There exists a Markov kernel $\kappa$ from $(S, \mathcal{B}(S))$ to $(S^{\times T}, \mathcal{B}(S)^{\otimes T})$ with $\kappa(x, B) = P_x(X \in B)$ for all $B \in \mathcal{B}(S)^{\otimes T}$.
+3. The Markov property applies: for all $t \geq s \geq 0$ and $A \in \mathcal{B}(S)$,
+   
+   $$P(X_t \in A | \mathcal{F}_s) = P(X_t \in A | X_s)$$
+
+Moreover, $X$ is called time-homogeneous if it satisfies the weak Markov property for all $t, s \geq 0$:
+
+$$P(X_{t+s} \in A | \mathcal{F}_s) = P(X_t \in A | X_0 = x)|_{x = X_s} =: P_t(X_s, A)$$
+
+The function $(t, x, A) \mapsto P_t(x, A)$ is the so-called transition function of $X$ and $(P_t)_{t \geq 0}$ the transition semigroup of the process. Transition functions are generalizations of the transition matrices used in the setting with finite state space.
+
+## Master Equation
+
+The master equation describes the evolution of the probability distribution in a continuous-time Markov chain. For the row vector of probability distribution $\pi$, the master equation has the form:
+
+$$\frac{d\pi}{dt} = \pi Q$$
+
+and essentially coincides with the forward Kolmogorov equation. In the physical literature, column vectors of probabilities are more commonly used, and the master equation is written in a form that explicitly uses the law of conservation of total probability:
+
+$$\frac{dp_i}{dt} = \sum_{j, j \neq i} (T_{ij}p_j - T_{ji}p_i)$$
+
+where $T_{ij} = q_{ji}$.
+
+If there exists a positive equilibrium $p_i^* > 0$ for the master equation, it can be written in the form:
+
+$$\frac{dp_i}{dt} = \sum_{j, j \neq i} T_{ij}p_j^* \left(\frac{p_j}{p_j^*} - \frac{p_i}{p_i^*}\right)$$
+
+## Time Reversal
+
+For a general Markov process $X$ in continuous time (a CTMC or a process with general state space), the reverse process $\overleftarrow{X} = (X_{T-t})_{t \in [0, T]}$ from a fixed time $T > 0$ is again a Markov process. This follows directly from the Markov property: Informally speaking, the future and the past are independent given the present. Under time-reversal, their roles are just interchanged.
+
+However, the reverse process is not time-homogeneous in general. If for some random time $\tau$ (not necessarily a stopping time) the stopped process $X^\tau = (X_{t \wedge \tau})_{t \geq 0}$ is a time-homogeneous Markov process, then the reverse process $\overleftarrow{X^\tau} = (X_{\tau - t \wedge \tau} 1_{\tau < \infty})_{t \geq 0}$ is again time-homogeneous.
+
+If $X$ is a CTMC, then by Kelly's lemma $\overleftarrow{X}$ has the same stationary distribution as the forward process.
+
+A chain is said to be reversible if the reversed process is the same as the forward process (in distribution). Kolmogorov's criterion states that the necessary and sufficient condition for a Markov chain to be reversible is that the product of transition rates around a closed loop must be the same in both directions.
+
+## Embedded Markov Chain
+
+One method of finding the stationary probability distribution, $\pi$, of an ergodic continuous-time Markov chain, $Q$, is by first finding its embedded Markov chain (EMC). Strictly speaking, the EMC is a regular discrete-time Markov chain, sometimes referred to as a jump process.
+
+Each element of the one-step transition probability matrix of the EMC, $S$, is denoted by $s_{ij}$, and represents the conditional probability of transitioning from state $i$ into state $j$. These conditional probabilities may be found by:
+
+$$s_{ij} = 
+\begin{cases}
+\frac{q_{ij}}{\sum_{k \neq i} q_{ik}} & \text{if } i \neq j \\
+0 & \text{otherwise}
+\end{cases}$$
+
+From this, $S$ may be written as:
+
+$$S = I - (\operatorname{diag}(Q))^{-1} Q$$
+
+where $I$ is the identity matrix and $\operatorname{diag}(Q)$ is the diagonal matrix formed by selecting the main diagonal from the matrix $Q$ and setting all other elements to zero.
+
+To find the stationary probability distribution vector, we must next find $\varphi$ such that:
+
+$$\varphi S = \varphi$$
+
+with $\varphi$ being a row vector, such that all elements in $\varphi$ are greater than 0 and $\|\varphi\|_1 = 1$. From this, $\pi$ may be found as:
+
+$$\pi = \frac{-\varphi (\operatorname{diag}(Q))^{-1}}{\|\varphi (\operatorname{diag}(Q))^{-1}\|_1}$$
+
+## Special Types of Markov Chains
+
+### Markov Model
+
+Markov models are used to model changing systems. There are 4 main types of models, that generalize Markov chains depending on whether every sequential state is observable or not, and whether the system is to be adjusted on the basis of observations made:
+
+1. **Markov Chain**: States are directly visible to the observer, and the parameters are the transition probabilities.
+2. **Hidden Markov Model**: States are not directly visible, but output dependent on the state is visible.
+3. **Markov Decision Process**: States are directly visible, and the parameters are both transition probabilities and rewards.
+4. **Partially Observable Markov Decision Process**: States are not directly visible, but output dependent on the state is visible, and the parameters are both transition probabilities and rewards.
+
+### Bernoulli Scheme
+
+A Bernoulli scheme is a special case of a Markov chain where the transition probability matrix has identical rows, which means that the next state is independent of even the current state (in addition to being independent of the past states). A Bernoulli scheme with only two possible states is known as a [Bernoulli process](/article/en/Bernoulli_process).
+
+Note, however, by the Ornstein isomorphism theorem, that every aperiodic and irreducible Markov chain is isomorphic to a Bernoulli scheme; thus, one might equally claim that Markov chains are a "special case" of Bernoulli schemes. The isomorphism generally requires a complicated recoding. The isomorphism theorem is even a bit stronger: it states that any stationary stochastic process is isomorphic to a Bernoulli scheme; the Markov chain is just one such example.
+
+### Subshift of Finite Type
+
+When the Markov matrix is replaced by the adjacency matrix of a finite graph, the resulting shift is termed a topological Markov chain or a subshift of finite type. A Markov matrix that is compatible with the adjacency matrix can then provide a measure on the subshift. Many chaotic dynamical systems are isomorphic to topological Markov chains; examples include [diffeomorphisms](/article/en/Diffeomorphism) of closed manifolds, the [Prouhet–Thue–Morse system](/article/en/Prouhet-Thue-Morse_sequence), the Chacon system, [sofic systems](/article/en/Sofic_system), context-free systems and block-coding systems.
+
+## Applications
+
+Markov chains have been employed in a wide range of topics across the natural and social sciences, and in technological applications.
+
+### Physics
+
+Markovian systems appear extensively in thermodynamics and statistical mechanics, whenever probabilities are used to represent unknown or unmodelled details of the system, if it can be assumed that the dynamics are time-invariant, and that no relevant history need be considered which is not already included in the state description. For example, a thermodynamic state operates under a probability distribution that is difficult or expensive to acquire. Therefore, [Markov Chain Monte Carlo](/article/en/Markov_Chain_Monte_Carlo) method can be used to draw samples randomly from a black-box to approximate the probability distribution of attributes over a range of objects.
+
+Markov chains are used in [lattice QCD](/article/en/Lattice_QCD) simulations.
+
+### Chemistry
+
+A reaction network is a chemical system involving multiple reactions and chemical species. The simplest stochastic models of such networks treat the system as a continuous time Markov chain with the state being the number of molecules of each species and with reactions modeled as possible transitions of the chain.
+
+Markov chains and continuous-time Markov processes are useful in chemistry when physical systems closely approximate the Markov property. For example, imagine a large number n of molecules in solution in state A, each of which can undergo a chemical reaction to state B with a certain average rate. Perhaps the molecule is an enzyme, and the states refer to how it is folded. The state of any single enzyme follows a Markov chain, and since the molecules are essentially independent of each other, the number of molecules in state A or B at a time is n times the probability a given molecule is in that state.
+
+The classical model of enzyme activity, [Michaelis–Menten kinetics](/article/en/Michaelis-Menten_kinetics), can be viewed as a Markov chain, where at each time step the reaction proceeds in some direction. While Michaelis-Menten is fairly straightforward, far more complicated reaction networks can also be modeled with Markov chains.
+
+An algorithm based on a Markov chain was also used to focus the fragment-based growth of chemicals in silico towards a desired class of compounds such as drugs or natural products. As a molecule is grown, a fragment is selected from the nascent molecule as the "current" state. It is not aware of its past (that is, it is not aware of what is already bonded to it). It then transitions to the next state when a fragment is attached to it. The transition probabilities are trained on databases of authentic classes of compounds.
+
+Also, the growth (and composition) of copolymers may be modeled using Markov chains. Based on the reactivity ratios of the monomers that make up the growing polymer chain, the chain's composition may be calculated (for example, whether monomers tend to add in alternating fashion or in long runs of the same monomer). Due to steric effects, second-order Markov effects may also play a role in the growth of some polymer chains.
+
+Similarly, it has been suggested that the crystallization and growth of some epitaxial superlattice oxide materials can be accurately described by Markov chains.
+
+### Biology
+
+Markov chains are used in various areas of biology. Notable examples include:
+
+- Phylogenetics and [bioinformatics](/article/en/Bioinformatics), where most models of [DNA evolution](/article/en/Molecular_evolution) use continuous-time Markov chains to describe the nucleotide present at a given site in the genome.
+- [Population dynamics](/article/en/Population_dynamics), where Markov chains are in particular a central tool in the theoretical study of matrix population models.
+- Neurobiology, where Markov chains have been used, e.g., to simulate the mammalian neocortex.
+- Systems biology, for instance with the modeling of viral infection of single cells.
+- Compartmental models for disease outbreak and epidemic modeling.
+
+### Information Theory
+
+Markov chains are used throughout [information processing](/article/en/Information_processing). Claude Shannon's famous 1948 paper "[A Mathematical Theory of Communication](/article/en/A_Mathematical_Theory_of_Communication)", which in a single step created the field of [information theory](/article/en/Information_theory), opens by introducing the concept of [entropy](/article/en/Entropy_(information_theory)) by modeling texts in a natural language (such as English) as generated by an ergodic Markov process, where each letter may depend statistically on previous letters.
+
+Such idealized models can capture many of the statistical regularities of systems. Even without describing the full structure of the system perfectly, such signal models can make possible very effective [data compression](/article/en/Data_compression) through entropy encoding techniques such as [arithmetic coding](/article/en/Arithmetic_coding). They also allow effective state estimation and pattern recognition. Markov chains also play an important role in [reinforcement learning](/article/en/Reinforcement_learning).
+
+Markov chains are also the basis for [hidden Markov models](/article/en/Hidden_Markov_model), which are an important tool in such diverse fields as [telephone networks](/article/en/Telephone_network) (which use the [Viterbi algorithm](/article/en/Viterbi_algorithm) for error correction), [speech recognition](/article/en/Speech_recognition) and bioinformatics (such as in rearrangements detection).
+
+The [LZMA](/article/en/LZMA) lossless data compression algorithm combines Markov chains with [Lempel-Ziv compression](/article/en/LZ77_and_LZ78) to achieve very high compression ratios.
+
+### Queueing Theory
+
+Markov chains are the basis for the analytical treatment of queues ([queueing theory](/article/en/Queueing_theory)). [Agner Krarup Erlang](/article/en/Agner_Krarup_Erlang) initiated the subject in 1917. This makes them critical for optimizing the performance of telecommunications networks, where messages must often compete for limited resources (such as bandwidth).
+
+Numerous queueing models use continuous-time Markov chains. For example, an [M/M/1 queue](/article/en/M/M/1_queue) is a CTMC on the non-negative integers where upward transitions from $i$ to $i + 1$ occur at rate $\lambda$ according to a [Poisson process](/article/en/Poisson_process) and describe job arrivals, while transitions from $i$ to $i – 1$ (for $i > 1$) occur at rate $\mu$ (job service times are exponentially distributed) and describe completed services (departures) from the queue.
+
+### Internet Applications
+
+The [PageRank](/article/en/PageRank) of a webpage as used by Google is defined by a Markov chain. It is the probability to be at page $i$ in the stationary distribution on the following Markov chain on all (known) webpages. If $N$ is the number of known webpages, and a page $i$ has $k_i$ links to it then it has transition probability $\frac{\alpha}{k_i} + \frac{1-\alpha}{N}$ for all pages that are linked to and $\frac{1-\alpha}{N}$ for all pages that are not linked to. The parameter $\alpha$ is taken to be about 0.15.
+
+Markov models have also been used to analyze web navigation behavior of users. A user's web link transition on a particular website can be modeled using first- or second-order Markov models and can be used to make predictions regarding future navigation and to personalize the web page for an individual user.
+
+### Statistics
+
+Markov chain methods have also become very important for generating sequences of random numbers to accurately reflect very complicated desired probability distributions, via a process called [Markov chain Monte Carlo](/article/en/Markov_chain_Monte_Carlo) (MCMC). In recent years this has revolutionized the practicability of [Bayesian inference](/article/en/Bayesian_inference) methods, allowing a wide range of posterior distributions to be simulated and their parameters found numerically.
+
+### Economics and Finance
+
+Markov chains are used in finance and economics to model a variety of different phenomena, including the distribution of income, the size distribution of firms, asset prices and market crashes.
+
+[D. G. Champernowne](/article/en/D._G._Champernowne) built a Markov chain model of the distribution of income in 1953. [Herbert A. Simon](/article/en/Herbert_A._Simon) and co-author Charles Bonini used a Markov chain model to derive a stationary [Yule distribution](/article/en/Yule_distribution) of firm sizes.
+
+[Louis Bachelier](/article/en/Louis_Bachelier) was the first to observe that stock prices followed a random walk. The random walk was later seen as evidence in favor of the [efficient-market hypothesis](/article/en/Efficient-market_hypothesis) and random walk models were popular in the literature of the 1960s. Regime-switching models of business cycles were popularized by [James D. Hamilton](/article/en/James_D._Hamilton) (1989), who used a Markov chain to model switches between periods of high and low GDP growth (or, alternatively, economic expansions and recessions). A more recent example is the Markov switching multifractal model of Laurent E. Calvet and Adlai J. Fisher, which builds upon the convenience of earlier regime-switching models. It uses an arbitrarily large Markov chain to drive the level of volatility of asset returns.
+
+[Dynamic macroeconomics](/article/en/Dynamic_stochastic_general_equilibrium) makes heavy use of Markov chains. An example is using Markov chains to exogenously model prices of equity (stock) in a general equilibrium setting.
+
+Credit rating agencies produce annual tables of the transition probabilities for bonds of different credit ratings.
+
+### Social Sciences
+
+Markov chains are generally used in describing path-dependent arguments, where current structural configurations condition future outcomes. An example is the reformulation of the idea, originally due to [Karl Marx's](/article/en/Karl_Marx) *Das Kapital*, tying economic development to the rise of [capitalism](/article/en/Capitalism). In current research, it is common to use a Markov chain to model how once a country reaches a specific level of economic development, the configuration of structural factors, such as size of the middle class, the ratio of urban to rural residence, the rate of political mobilization, etc., will generate a higher probability of transitioning from authoritarian to democratic regime.
+
+### Music
+
+Markov chains are employed in [algorithmic music composition](/article/en/Algorithmic_composition), particularly in software such as [Csound](/article/en/Csound), [Max](/article/en/Max_(software)), and [SuperCollider](/article/en/SuperCollider). In a first-order chain, the states of the system become note or pitch values, and a probability vector for each note is constructed, completing a transition probability matrix. An algorithm is constructed to produce output note values based on the transition matrix weightings, which could be MIDI note values, frequency (Hz), or any other desirable metric.
+
+A second-order Markov chain can be introduced by considering the current state and also the previous state, as indicated in the second table. Higher, nth-order chains tend to "group" particular notes together, while 'breaking off' into other patterns and sequences occasionally. These higher-order chains tend to generate results with a sense of phrasal structure, rather than the 'aimless wandering' produced by a first-order system.
+
+Markov chains can be used structurally, as in Xenakis's Analogique A and B. Markov chains are also used in systems which use a Markov model to react interactively to music input.
+
+Usually musical systems need to enforce specific control constraints on the finite-length sequences they generate, but control constraints are not compatible with Markov models, since they induce long-range dependencies that violate the Markov hypothesis of limited memory. In order to overcome this limitation, a new approach has been proposed.
+
+### Games and Sports
+
+Markov chains can be used to model many games of chance. The children's games [Snakes and Ladders](/article/en/Snakes_and_Ladders) and "Hi Ho! Cherry-O", for example, are represented exactly by Markov chains. At each turn, the player starts in a given state (on a given square) and from there has fixed odds of moving to certain other states (squares).
+
+Markov chain models have been used in advanced baseball analysis since 1960, although their use is still rare. Each half-inning of a baseball game fits the Markov chain state when the number of runners and outs are considered. During any at-bat, there are 24 possible combinations of number of outs and position of the runners. Mark Pankin shows that Markov chain models can be used to evaluate runs created for both individual players as well as a team. He also discusses various kinds of strategies and play conditions: how Markov chain models have been used to analyze statistics for game situations such as bunting and base stealing and differences when playing on grass vs. AstroTurf.
+
+### Markov Text Generators
+
+Markov processes can also be used to generate superficially real-looking text given a sample document. Markov processes are used in a variety of recreational "parody generator" software (see [dissociated press](/article/en/Dissociated_press), [Jeff Harrison](/article/en/Jeff_Harrison), [Mark V. Shaney](/article/en/Mark_V._Shaney), and [Academias Neutronium](/article/en/Academias_Neutronium)). Several open-source text generation libraries using Markov chains exist.
+
+## Lyapunov Functions for the Master Equation
+
+For the master equation, there exists a rich family of convex Lyapunov functions — monotonically changing with time functions of probability distributions. Let $h(x)\,(x>0)$ be a convex function of one variable. For any positive probability distribution ($p_{i}>0$), define the Morimoto function $H_{h}(p)$:
+
+$$H_{h}(p)=\sum_{i}p_{i}^{*}h\left(\frac{p_{i}}{p_{i}^{*}}\right)$$
+
+The derivative of $H_{h}(p)$ with respect to time, if $p(t)$ satisfies the master equation, is:
+
+$$\frac{dH_{h}(p(t))}{dt}=\sum_{i,j\,i\neq j}T_{ij}p_{j}^{*}\left[h\left(\frac{p_{i}}{p_{i}^{*}}\right)-h\left(\frac{p_{j}}{p_{j}^{*}}\right)+h'\left(\frac{p_{i}}{p_{i}^{*}}\right)\left(\frac{p_{j}}{p_{j}^{*}}-\frac{p_{i}}{p_{i}^{*}}\right)\right]\leq 0$$
+
+The last inequality holds because of the convexity of $h(x)$.
+
+## See Also
+
+- [Markov property](/article/en/Markov_property)
+- [Hidden Markov model](/article/en/Hidden_Markov_model)
+- [Quantum Markov chain](/article/en/Quantum_Markov_chain)
+- [Markov Chain Monte Carlo](/article/en/Markov_Chain_Monte_Carlo)
+- [Markov decision process](/article/en/Markov_decision_process)
+- [Markov random field](/article/en/Markov_random_field)
+- [Markov blanket](/article/en/Markov_blanket)
+- [Random walk](/article/en/Random_walk)
+- [Brownian motion](/article/en/Brownian_motion)
+- [Queueing theory](/article/en/Queueing_theory)
+- [Master equation](/article/en/Master_equation)
+- [Semi-Markov process](/article/en/Semi-Markov_process)
+- [PageRank](/article/en/PageRank)
+- [Markov text generators](/article/en/Markov_text_generators)
