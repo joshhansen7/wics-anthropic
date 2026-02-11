@@ -175,8 +175,7 @@ def select_relevant_languages(
         response = client.responses.create(
             model=AI_MODEL,
             input=prompt,
-            max_output_tokens=1000,
-            temperature=0.2
+            max_output_tokens=1000
         )
 
         response_text = response.output_text or ""
@@ -286,8 +285,7 @@ def translate_with_ai(client: OpenAI, text: str, source_lang: str, target_lang: 
         response = client.responses.create(
             model=AI_MODEL,
             input=prompt,
-            max_output_tokens=64000,
-            temperature=0.2
+            max_output_tokens=64000
         )
         translation = response.output_text or ""
         if translation:
@@ -319,8 +317,7 @@ def synthesize_with_ai(client: OpenAI, articles: Dict[str, str], target_lang: st
         response = client.responses.create(
             model=AI_MODEL,
             input=prompt,
-            max_output_tokens=64000,
-            temperature=0.2
+            max_output_tokens=64000
         )
         synthesis = response.output_text or ""
         if synthesis:

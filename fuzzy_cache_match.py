@@ -116,8 +116,7 @@ def ai_cache_match(client: OpenAI, query: str, language: str, cached_articles: L
         response = client.responses.create(
             model="gpt-5-mini",
             input=prompt,
-            max_output_tokens=1000,
-            temperature=0.2
+            max_output_tokens=1000
         )
 
         response_text = response.output_text or ""
