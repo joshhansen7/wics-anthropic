@@ -2,7 +2,7 @@
 Wikipedia Fuzzy Search Module
 
 Enhances Wikipedia search with fuzzy matching to handle misspellings
-and provide better search results using Claude AI.
+and provide better search results using AI.
 """
 
 import wikipediaapi
@@ -81,7 +81,7 @@ def paginate_text(text: str, tokens_per_page: int = 10000) -> List[str]:
     Returns:
         List of text pages
     """
-    enc = tiktoken.get_encoding("cl100k_base")  # Claude's encoding
+    enc = tiktoken.get_encoding("cl100k_base")
     tokens = enc.encode(text)
     
     pages = []
@@ -190,7 +190,7 @@ def perform_fuzzy_search(title: str, language: str) -> List[Dict[str, str]]:
 
     return formatted_results
 
-# Claude evaluation prompt for selecting the best result
+# AI evaluation prompt for selecting the best result
 SEARCH_EVALUATION_PROMPT = """
 I need your help selecting the most relevant Wikipedia article from search results for a user query.
 
@@ -212,10 +212,10 @@ Format your response as a JSON object like this:
 
 def evaluate_search_results(client, user_query: str, search_results: List[Dict[str, str]]) -> str:
     """
-    Uses Claude to evaluate search results and select the most relevant one.
+    Uses AI to evaluate search results and select the most relevant one.
     
     Args:
-        client: Anthropic client
+        client: OpenAI client
         user_query: The original search query
         search_results: List of search results to evaluate
         
@@ -236,18 +236,14 @@ def evaluate_search_results(client, user_query: str, search_results: List[Dict[s
     )
     
     try:
-        # Make API call to Claude
-        response = client.messages.create(
-            model="claude-haiku-4-5",
-            max_tokens=1000,
-            messages=[
-                {"role": "user", "content": prompt}
-            ],
+        response = client.responses.create(
+            model="gpt-5-mini",
+            input=prompt,
+            max_output_tokens=1000,
             temperature=0.2
         )
-        
-        # Extract JSON response
-        response_text = response.content[0].text
+
+        response_text = response.output_text or ""
         
         # Find JSON object in response
         json_match = re.search(r'({[\s\S]*})', response_text)
@@ -266,9 +262,9 @@ def evaluate_search_results(client, user_query: str, search_results: List[Dict[s
             print(f"Failed to extract JSON from response: {response_text}")
             
     except Exception as e:
-        print(f"Error in Claude API call: {e}")
+        print(f"Error in AI API call: {e}")
     
-    # Fallback: return the first search result if Claude fails
+    # Fallback: return the first search result if AI fails
     return search_results[0]["title"] if search_results else ""
 
 def get_wikipedia_article_with_fuzzy_search(
@@ -282,7 +278,7 @@ def get_wikipedia_article_with_fuzzy_search(
     then in fallback languages), and only then resorting to fuzzy search.
     
     Args:
-        client: Anthropic client
+        client: OpenAI client
         title: The title of the Wikipedia article
         language: The language code
         first_article: Flag to allow fuzzy search in fallback languages
@@ -343,7 +339,5 @@ def get_wikipedia_article_with_fuzzy_search(
     
     # Not found anywhere
     return None, None
-
-
 
 

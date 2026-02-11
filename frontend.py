@@ -3,12 +3,12 @@
 Linguapedia Web Frontend
 
 A Flask web interface for synthesizing Wikipedia articles from multiple
-language editions using Claude AI.
+language editions using AI.
 """
 
 from flask import Flask, render_template, request, redirect, url_for, jsonify, session, send_file
 import backend
-from anthropic import Anthropic
+from openai import OpenAI
 import os
 import uuid
 import threading
@@ -25,8 +25,8 @@ app.secret_key = os.urandom(24)
 jobs = {}
 slug_to_job = {}
 
-# Create Anthropic client
-client = Anthropic(api_key=os.getenv("CLAUDE_API_KEY"))
+# Create OpenAI client
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # Available languages
 LANGUAGES = [
@@ -331,7 +331,7 @@ def process_job(job_id, title, language, max_translations, no_cache=False):
         
         # Step 5: Synthesize final article
         jobs[job_id]['progress'] = 80
-        synthesized_article = backend.synthesize_with_claude(
+        synthesized_article = backend.synthesize_with_ai(
             client, translated_articles, language, jobs[job_id]['title']
         )
 

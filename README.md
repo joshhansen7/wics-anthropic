@@ -1,6 +1,6 @@
 # Linguapedia
 
-A multilingual Wikipedia synthesizer powered by Claude AI that combines articles from multiple language editions into comprehensive, synthesized articles.
+A multilingual Wikipedia synthesizer powered by AI that combines articles from multiple language editions into comprehensive, synthesized articles.
 
 ## Overview
 
@@ -9,7 +9,7 @@ Linguapedia takes Wikipedia articles across different languages, intelligently s
 ## Features
 
 - **Multilingual Synthesis**: Combines Wikipedia articles from up to 5 different language editions
-- **Intelligent Language Selection**: Uses Claude AI to select the most relevant language editions for each topic
+- **Intelligent Language Selection**: Uses AI to select the most relevant language editions for each topic
 - **Fuzzy Search**: Smart search that handles misspellings and variations
 - **Smart Caching**: Fuzzy cache matching prevents duplicate synthesis of similar articles
 - **Web Interface**: Clean Flask-based UI supporting 10+ languages
@@ -32,7 +32,7 @@ Linguapedia takes Wikipedia articles across different languages, intelligently s
 ## Requirements
 
 - Python 3.8+
-- Anthropic API key (Claude 4.5 Haiku)
+- OpenAI API key (GPT-5-mini)
 - Internet connection for Wikipedia access
 
 ## Installation
@@ -51,7 +51,7 @@ pip install -r requirements.txt
 3. Set up environment variables:
 ```bash
 # Create a .env file
-echo "CLAUDE_API_KEY=your_api_key_here" > .env
+echo "OPENAI_API_KEY=your_api_key_here" > .env
 ```
 
 ## Usage
@@ -102,7 +102,7 @@ python backend.py "Climate Change" en --no-cache
 
 1. **backend.py**: Core synthesis engine
    - Article retrieval with fuzzy search
-   - Language selection using Claude AI
+   - Language selection using AI
    - Parallel translation pipeline
    - Article synthesis
 
@@ -115,27 +115,27 @@ python backend.py "Climate Change" en --no-cache
 3. **wikipedia_fuzzy_search.py**: Smart Wikipedia search
    - Fuzzy matching for article titles
    - Fallback to multiple languages
-   - Claude-powered result evaluation
+   - AI-powered result evaluation
 
 4. **fuzzy_cache_match.py**: Intelligent cache matching
    - Prevents duplicate synthesis
-   - Claude-powered similarity detection
+   - AI-powered similarity detection
    - Smart redirects to existing articles
 
 ### How It Works
 
 1. **Search**: User searches for an article by title
 2. **Retrieve**: System finds the article using fuzzy search (handles typos)
-3. **Select Languages**: Claude AI selects most relevant language editions
+3. **Select Languages**: AI selects most relevant language editions
 4. **Fetch Content**: Retrieves articles from selected languages
 5. **Translate**: Parallel translation of all articles to target language
-6. **Synthesize**: Claude combines all versions into comprehensive article
+6. **Synthesize**: AI combines all versions into comprehensive article
 7. **Cache**: Saves result for future requests
 8. **Display**: Shows synthesized article with automatic linking
 
 ## API Integration
 
-Uses Anthropic's Claude 4.5 Haiku model for:
+Uses OpenAI's GPT-5-mini model for:
 - Language selection decisions
 - Translation of article content
 - Article synthesis
@@ -160,11 +160,11 @@ The fuzzy cache matcher can redirect similar queries to existing cached articles
 
 ### Environment Variables
 
-- `CLAUDE_API_KEY`: Your Anthropic API key (required)
+- `OPENAI_API_KEY`: Your OpenAI API key (required)
 
 ### Model Configuration
 
-The application uses Claude 4.5 Haiku by default. To change the model, update `CLAUDE_MODEL` in:
+The application uses GPT-5-mini by default. To change the model, update `AI_MODEL` in:
 - `backend.py`
 - `wikipedia_fuzzy_search.py`
 - `fuzzy_cache_match.py`
@@ -181,7 +181,7 @@ python frontend.py
 
 The application includes a `render.yaml` for deployment to Render.com:
 
-1. Set `CLAUDE_API_KEY` in environment variables
+1. Set `OPENAI_API_KEY` in environment variables
 2. Deploy using `gunicorn frontend:app`
 
 ## Performance
@@ -197,7 +197,7 @@ Caching dramatically improves subsequent requests for the same or similar articl
 ## Limitations
 
 - Wikipedia API rate limits may apply
-- Claude API costs scale with article length and number of languages
+- AI API costs scale with article length and number of languages
 - Very long articles may be truncated to fit token limits
 - Some Wikipedia formatting may be lost in synthesis
 
@@ -216,7 +216,7 @@ Contributions are welcome! Areas for improvement:
 
 ## Acknowledgments
 
-- Powered by [Anthropic Claude](https://www.anthropic.com/)
+- Powered by [OpenAI GPT-5-mini](https://www.openai.com/)
 - Wikipedia content via [Wikipedia API](https://www.mediawiki.org/wiki/API)
 - Built with [Flask](https://flask.palletsprojects.com/)
 

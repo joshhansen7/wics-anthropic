@@ -1,12 +1,12 @@
 /* Base styles */
 :root {
-    --primary-color: #da7756; /* Claude brand color */
-    --primary-hover: #bd5d3a; /* Claude chat button color */
-    --bg-dark: #3d3929; /* Claude font color */
+    --primary-color: #da7756; /* Primary brand color */
+    --primary-hover: #bd5d3a; /* Primary hover color */
+    --bg-dark: #3d3929; /* Primary text color */
     --bg-darker: #262114;
-    --bg-light: #eeece2; /* Claude website background */
+    --bg-light: #eeece2; /* Page background */
     --text-light: #f3f4f6;
-    --text-dark: #3d3929; /* Claude font color */
+    --text-dark: #3d3929; /* Primary text color */
     --text-gray: #6b7280;
 }
 
@@ -17,7 +17,7 @@
 }
 
 body {
-    font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif; /* Claude website font */
+    font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
     line-height: 1.6;
     color: var(--text-dark);
     background-color: var(--bg-light);
@@ -726,8 +726,8 @@ a:hover {
     background-color: #f8f8f8;
 }
 
-/* Claude attribution */
-.claude-attribution {
+/* AI attribution */
+.ai-attribution {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -735,9 +735,13 @@ a:hover {
     color: var(--text-gray);
 }
 
-.claude-logo {
+.ai-logo {
     height: 20px;
     margin-right: 0.5rem;
+}
+
+.line-through {
+    text-decoration: line-through;
 }
 
 /* Status page step items */

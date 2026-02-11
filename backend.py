@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
-Wikipedia Synthesizer with Claude
+Wikipedia Synthesizer with AI
 
-Combines Wikipedia articles from multiple language editions using Claude AI.
+Combines Wikipedia articles from multiple language editions using AI.
 - Finds article translations across different languages
-- Uses Claude to select the most relevant language editions
+- Uses AI to select the most relevant language editions
 - Translates all editions to a target language
 - Synthesizes them into a comprehensive multilingual article
 """
@@ -17,11 +17,11 @@ import json
 import os
 from typing import Dict, List, Optional, Tuple
 from multiprocessing.dummy import Pool as ThreadPool
-from anthropic import Anthropic
+from openai import OpenAI
 
 
 def create_language_selection_prompt(title: str, max_translations: int, source_lang: str, lang_options_text: str) -> str:
-    """Generate prompt for Claude to select relevant languages."""
+    """Generate prompt for the AI model to select relevant languages."""
     return f"""Select the {max_translations} most relevant Wikipedia language editions for "{title}".
 
 Choose languages that would provide:
@@ -84,9 +84,9 @@ Requirements:
 
 SYNTHESIZED ARTICLE:"""
 
-# Claude API information
-CLAUDE_API_KEY = os.getenv("CLAUDE_API_KEY")
-CLAUDE_MODEL = "claude-haiku-4-5"
+# AI API information
+AI_API_KEY = os.getenv("OPENAI_API_KEY")
+AI_MODEL = "gpt-5-mini"
 
 # Define cache directory
 CACHE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "cache")
@@ -117,8 +117,8 @@ SEARCH_WIKIPEDIA_TOOL = {
     }
 }
 
-# Define tools list for Claude
-CLAUDE_TOOLS = [SEARCH_WIKIPEDIA_TOOL]
+# Define tools list for AI
+AI_TOOLS = [SEARCH_WIKIPEDIA_TOOL]
 
 # Import the fuzzy search functionality
 from wikipedia_fuzzy_search import (
@@ -127,7 +127,7 @@ from wikipedia_fuzzy_search import (
 )
 
 def get_wikipedia_article_with_tool(
-    client: Anthropic,
+    client: OpenAI,
     title: str,
     language: str,
     first_article: bool = False
@@ -136,7 +136,7 @@ def get_wikipedia_article_with_tool(
     Retrieves a Wikipedia article using fuzzy search when needed.
 
     Args:
-        client: Anthropic client
+        client: OpenAI client
         title: Article title to search for
         language: Language code (e.g., 'en', 'es', 'fr')
         first_article: Enable fallback fuzzy search in other languages
@@ -147,17 +147,17 @@ def get_wikipedia_article_with_tool(
     return get_wikipedia_article_with_fuzzy_search(client, title, language, first_article)
 
 def select_relevant_languages(
-    client: Anthropic,
+    client: OpenAI,
     title: str,
     source_lang: str,
     all_lang_links: List[Dict],
     max_translations: int = 5
 ) -> List[str]:
     """
-    Uses Claude to select the most relevant languages for a given topic.
+    Uses AI to select the most relevant languages for a given topic.
 
     Args:
-        client: Anthropic client
+        client: OpenAI client
         title: Article title
         source_lang: Source language code
         all_lang_links: Available language editions
@@ -172,17 +172,14 @@ def select_relevant_languages(
     prompt = create_language_selection_prompt(title, max_translations, source_lang, lang_options_text)
     
     try:
-        response = client.messages.create(
-            model=CLAUDE_MODEL,
-            max_tokens=1000,
-            messages=[
-                {"role": "user", "content": prompt}
-            ],
+        response = client.responses.create(
+            model=AI_MODEL,
+            input=prompt,
+            max_output_tokens=1000,
             temperature=0.2
         )
-        
-        # Extract JSON response
-        response_text = response.content[0].text
+
+        response_text = response.output_text or ""
         
         # Find JSON object in response
         import re
@@ -208,9 +205,9 @@ def select_relevant_languages(
             print(f"Failed to extract JSON from response: {response_text}")
             
     except Exception as e:
-        print(f"Error in Claude API call: {e}")
-    
-    # Fallback to selecting languages based on alphabetical order if Claude fails
+        print(f"Error in AI API call: {e}")
+
+    # Fallback to selecting languages based on alphabetical order if AI fails
     print("Falling back to alphabetical order selection")
     langs = [link["language"] for link in all_lang_links if link["language"] != source_lang]
     return langs[:max_translations]
@@ -263,12 +260,12 @@ def get_translation_content_with_tool(translations: List[Tuple[str, str]]) -> Di
             
     return translation_content
 
-def translate_with_claude(client: Anthropic, text: str, source_lang: str, target_lang: str) -> str:
+def translate_with_ai(client: OpenAI, text: str, source_lang: str, target_lang: str) -> str:
     """
-    Translates text using Claude API with streaming.
+    Translates text using the AI API.
 
     Args:
-        client: Anthropic client
+        client: OpenAI client
         text: Text to translate
         source_lang: Source language code
         target_lang: Target language code
@@ -285,36 +282,29 @@ def translate_with_claude(client: Anthropic, text: str, source_lang: str, target
     prompt = create_translation_prompt(source_lang, target_lang, text)
     
     try:
-        # Use the Anthropic SDK with streaming
-        print(f"  Starting translation stream from {source_lang} to {target_lang}...")
-        with client.messages.stream(
-            model=CLAUDE_MODEL,
-            max_tokens=64000,
-            messages=[
-                {"role": "user", "content": prompt}
-            ]
-        ) as stream:
-            # Collect the streamed response
-            translation = ""
-            for text in stream.text_stream:
-                translation += text
-            
-            if translation:
-                return translation
-            else:
-                print(f"Warning: Empty translation result")
-                return f"Translation failed: Empty result"
+        print(f"  Starting translation from {source_lang} to {target_lang}...")
+        response = client.responses.create(
+            model=AI_MODEL,
+            input=prompt,
+            max_output_tokens=64000,
+            temperature=0.2
+        )
+        translation = response.output_text or ""
+        if translation:
+            return translation
+        print("Warning: Empty translation result")
+        return "Translation failed: Empty result"
             
     except Exception as e:
-        print(f"Error in Claude API call: {e}")
+        print(f"Error in AI API call: {e}")
         return f"Translation failed: {str(e)}"
 
-def synthesize_with_claude(client: Anthropic, articles: Dict[str, str], target_lang: str, original_title: str) -> str:
+def synthesize_with_ai(client: OpenAI, articles: Dict[str, str], target_lang: str, original_title: str) -> str:
     """
     Synthesizes multiple translated articles into one comprehensive article.
 
     Args:
-        client: Anthropic client
+        client: OpenAI client
         articles: Language code to article content mapping
         target_lang: Target language code
         original_title: Original article title
@@ -325,28 +315,21 @@ def synthesize_with_claude(client: Anthropic, articles: Dict[str, str], target_l
     prompt = create_synthesis_prompt(original_title, articles, target_lang)
     
     try:
-        # Use the Anthropic SDK with streaming
-        print(f"  Starting synthesis stream...")
-        with client.messages.stream(
-            model=CLAUDE_MODEL,
-            max_tokens=64000,
-            messages=[
-                {"role": "user", "content": prompt}
-            ]
-        ) as stream:
-            # Collect the streamed response
-            synthesis = ""
-            for text in stream.text_stream:
-                synthesis += text
-            
-            if synthesis:
-                return synthesis
-            else:
-                print(f"Warning: Empty synthesis result")
-                return f"Synthesis failed: Empty result"
+        print("  Starting synthesis...")
+        response = client.responses.create(
+            model=AI_MODEL,
+            input=prompt,
+            max_output_tokens=64000,
+            temperature=0.2
+        )
+        synthesis = response.output_text or ""
+        if synthesis:
+            return synthesis
+        print("Warning: Empty synthesis result")
+        return "Synthesis failed: Empty result"
             
     except Exception as e:
-        print(f"Error in Claude API call: {e}")
+        print(f"Error in AI API call: {e}")
         return f"Synthesis failed: {str(e)}"
 
 def translate_article_worker(args):
@@ -365,7 +348,7 @@ def translate_article_worker(args):
         return lang, content
 
     print(f"  Translating from {lang} to {target_lang}...")
-    translated = translate_with_claude(client, content, lang, target_lang)
+    translated = translate_with_ai(client, content, lang, target_lang)
 
     if translated.startswith("Translation failed:"):
         print(f"  Warning: {translated}")
@@ -454,7 +437,7 @@ def main():
     parser.add_argument('--max_translations', type=int, default=5, 
                         help='Maximum number of translations to process (default: 5)')
     parser.add_argument('--output', help='Output file path (optional)')
-    parser.add_argument('--api_key', help='Claude API key (optional, overrides default)')
+    parser.add_argument('--api_key', help='AI API key (optional, overrides default)')
     parser.add_argument('--threads', type=int, default=10,
                         help='Number of parallel threads for translation (default: 10)')
     parser.add_argument('--no-cache', action='store_true',
@@ -463,9 +446,9 @@ def main():
     args = parser.parse_args()
     
     # Update API key if provided
-    global CLAUDE_API_KEY
+    global AI_API_KEY
     if args.api_key:
-        CLAUDE_API_KEY = args.api_key
+        AI_API_KEY = args.api_key
     
     # Check cache first unless no-cache is specified
     if not args.no_cache:
@@ -489,8 +472,8 @@ def main():
                     
             return
     
-    # Create Anthropic client
-    client = Anthropic(api_key=CLAUDE_API_KEY)
+    # Create OpenAI client
+    client = OpenAI(api_key=AI_API_KEY)
     
     print(f"Step 1: Retrieving article '{args.title}' in {args.language}...")
     original_text, langlinks = get_wikipedia_article_with_tool(args.title, args.language)
@@ -501,7 +484,7 @@ def main():
     
     print(f"Found article with {len(langlinks)} translations")
     
-    # Select most relevant languages using Claude
+    # Select most relevant languages using AI
     print(f"Step 2: Selecting the most relevant languages for this topic...")
     relevant_languages = select_relevant_languages(
         client, 
@@ -548,7 +531,7 @@ def main():
                 translated_articles[lang] = translated
     
     print(f"Step 5: Synthesizing {len(translated_articles)} articles...")
-    synthesized_article = synthesize_with_claude(client, translated_articles, args.language, args.title)
+    synthesized_article = synthesize_with_ai(client, translated_articles, args.language, args.title)
     
     if synthesized_article.startswith("Synthesis failed:"):
         print(f"Error: {synthesized_article}")

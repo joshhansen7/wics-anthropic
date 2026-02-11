@@ -1,7 +1,7 @@
 """
 Fuzzy Cache Matching Module
 
-Uses Claude AI to determine if a search query matches an existing
+Uses AI to determine if a search query matches an existing
 cached article, enabling smart redirects instead of duplicate synthesis.
 """
 
@@ -9,11 +9,11 @@ import os
 import json
 import difflib
 from typing import List, Dict, Optional, Tuple
-from anthropic import Anthropic
+from openai import OpenAI
 
 SIMILARITY_THRESHOLD = 0.95
 
-# Function to get Claude to evaluate cache matches
+# Function to get AI to evaluate cache matches
 CACHE_MATCH_PROMPT = """
 I need your help determining if a user's search query is similar enough to existing cached articles that we should redirect to one of them, rather than creating a new article.
 
@@ -63,7 +63,7 @@ def get_cached_articles(cache_dir: str, language: str) -> List[Dict]:
 
 def basic_similarity_check(query: str, cached_articles: List[Dict]) -> Optional[Dict]:
     """
-    Quick similarity check using difflib before calling Claude.
+    Quick similarity check using difflib before calling AI.
 
     Args:
         query: User's search query
@@ -88,12 +88,12 @@ def basic_similarity_check(query: str, cached_articles: List[Dict]) -> Optional[
 
     return None
 
-def claude_cache_match(client: Anthropic, query: str, language: str, cached_articles: List[Dict]) -> Tuple[bool, Optional[Dict], float, str]:
+def ai_cache_match(client: OpenAI, query: str, language: str, cached_articles: List[Dict]) -> Tuple[bool, Optional[Dict], float, str]:
     """
-    Use Claude to determine if query should redirect to existing cached article.
+    Use AI to determine if query should redirect to existing cached article.
 
     Args:
-        client: Anthropic client
+        client: OpenAI client
         query: User's search query
         language: Language code
         cached_articles: List of cached articles
@@ -113,14 +113,14 @@ def claude_cache_match(client: Anthropic, query: str, language: str, cached_arti
     )
 
     try:
-        response = client.messages.create(
-            model="claude-haiku-4-5",
-            max_tokens=1000,
-            messages=[{"role": "user", "content": prompt}],
+        response = client.responses.create(
+            model="gpt-5-mini",
+            input=prompt,
+            max_output_tokens=1000,
             temperature=0.2
         )
 
-        response_text = response.content[0].text
+        response_text = response.output_text or ""
 
         import re
         json_match = re.search(r'({[\s\S]*})', response_text)
@@ -148,16 +148,16 @@ def claude_cache_match(client: Anthropic, query: str, language: str, cached_arti
             print(f"Failed to extract JSON from response: {response_text}")
 
     except Exception as e:
-        print(f"Error in Claude API call: {e}")
+        print(f"Error in AI API call: {e}")
 
     return False, None, 0.0, "Error processing the request"
 
-def find_fuzzy_cache_match(client: Anthropic, query: str, language: str, cache_dir: str) -> Tuple[bool, Optional[str], float, str]:
+def find_fuzzy_cache_match(client: OpenAI, query: str, language: str, cache_dir: str) -> Tuple[bool, Optional[str], float, str]:
     """
     Determine if query should redirect to existing cached article.
 
     Args:
-        client: Anthropic client
+        client: OpenAI client
         query: User's search query
         language: Language code
         cache_dir: Path to cache directory
@@ -175,8 +175,8 @@ def find_fuzzy_cache_match(client: Anthropic, query: str, language: str, cache_d
     if basic_match:
         return True, basic_match["path"], 1.0, f"Exact or near-exact match: {basic_match['filename']}"
 
-    # Use Claude for sophisticated matching
-    should_redirect, matching_article, confidence, rationale = claude_cache_match(
+    # Use AI for sophisticated matching
+    should_redirect, matching_article, confidence, rationale = ai_cache_match(
         client, query, language, cached_articles
     )
 
